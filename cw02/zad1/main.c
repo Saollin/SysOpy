@@ -51,21 +51,21 @@ void sysCopy(char * fileFrom, char * fileTo, int numOfRecords, int recordSize) {
 
 void libCopy(char * fileFrom, char * fileTo, int numOfRecords, int recordSize) {
     int bufforSize = recordSize + 1;
-    FILE from = fopen(fileFrom, "r"); 
+    FILE * from = fopen(fileFrom, "r"); 
     if (from < 0) {
         error("Cant open source file to copy with lib functions");
     }
-    FILE to = fopen(fileTo, "w");
+    FILE * to = fopen(fileTo, "w");
     if (to < 0) {
         error("Cant open destination file with lib functions");
     }
     char * buffor = calloc(bufforSize, sizeof(char));
     for(int i = 0; i < numOfRecords; i++) {
         int bites = fread(buffor, sizeof(char), bufforSize, from);
-        if( != bufforSize){
+        if(bites != bufforSize || bites == 0){
             error("Cant read from source file with lib functions");
         }
-        if(write(buffor, sizeof(char), bufforSize, to) != bufforSize) {
+        if(fwrite(buffor, sizeof(char), bufforSize, to) != bufforSize) {
             error("Cant write to destination file with lib functions");
         }
     }
@@ -79,7 +79,7 @@ void sysSort(char * fileName, int numOfRecords, int recordSize) {
     if (file < 0) {
         error("Cant open file to sort with sys functions");
     }
-    sysQuickSort(f, numOfRecords, numOfRecords, 0, numOfRecords - 1);
+    sysQuickSort(file, numOfRecords, numOfRecords, 0, numOfRecords - 1);
 
     close(file);
 }
@@ -104,7 +104,7 @@ int sysPartition(int file, int numOfRecords, int recordSize, int low, int high) 
         error("Cant seek file to lib sort");
     }
     if(read(file, buff1, bufforSize) < 0) {
-        error("Cant read file to sys sort")
+        error("Cant read file to sys sort");
     }
     unsigned char minChar = buff1[0];
     int i = low -1;
@@ -114,7 +114,7 @@ int sysPartition(int file, int numOfRecords, int recordSize, int low, int high) 
             error("Cant seek file to lib sort");
         }
         if(read(file, buff2, bufforSize) < 0) {
-            error("Cant read file to sys sort")
+            error("Cant read file to sys sort");
         }
         if(buff2[0] < minChar) {
             i++;
@@ -135,25 +135,25 @@ void sysSwapInFile(int file, int numOfRecords, int recordSize, int i, int j) {
         error("Cant seek file to swap records 1");
     }
     if(read(file, buff1, bufforSize) < 0) {
-        error("Cant read file to swap records 2")
+        error("Cant read file to swap records 2");
     }
     if(lseek(file, j * bufforSize, SEEK_SET) < 0) {
         error("Cant seek file to swap records 3");
     }
     if(read(file, buff2, bufforSize) < 0) {
-        error("Cant read file to swap records 4")
+        error("Cant read file to swap records 4");
     }
     if(lseek(file, i * bufforSize, SEEK_SET) < 0) {
         error("Cant seek file to swap records 5");
     }
     if(write(file, buff2, bufforSize) < 0) {
-        error("Cant write in file to swap records 6")
+        error("Cant write in file to swap records 6");
     }
     if(lseek(file, j * bufforSize, SEEK_SET) < 0) {
         error("Cant seek file to swap records 7");
     }
     if(write(file, buff1, bufforSize) < 0) {
-        error("Cant write in file to swap records 8")
+        error("Cant write in file to swap records 8");
     }
     free(buff1);
     free(buff2);
@@ -189,7 +189,7 @@ int lilbPartition(FILE * file, int numOfRecords, int recordSize, int low, int hi
         error("Cant seek file to lib sort");
     }
     if(fread(buff1, sizeof(char), bufforSize, file) < 0) {
-        error("Cant read file to sys sort")
+        error("Cant read file to sys sort");
     }
     unsigned char minChar = buff1[0];
     int i = low - 1;
@@ -199,7 +199,7 @@ int lilbPartition(FILE * file, int numOfRecords, int recordSize, int low, int hi
             error("Cant seek file to lib sort");
         }
         if(fread(buff2, sizeof(char), bufforSize, file) < 0) {
-            error("Cant read file to sys sort")
+            error("Cant read file to sys sort");
         }
         if(buff2[0] < minChar) {
             i++;
@@ -220,25 +220,25 @@ void libSwapInFile(FILE * file, int numOfRecords, int recordSize, int i, int j) 
         error("Cant seek file to swap records 1");
     }
     if(fread(buff1, sizeof(char), bufforSize, file) < 0) {
-        error("Cant read file to swap records 2")
+        error("Cant read file to swap records 2");
     }
     if(fseek(file, j * bufforSize, SEEK_SET) < 0) {
         error("Cant seek file to swap records 3");
     }
     if(fread(buff2, sizeof(char), bufforSize, file) < 0) {
-        error("Cant read file to swap records 4")
+        error("Cant read file to swap records 4");
     }
     if(fseek(file, i * bufforSize, SEEK_SET) < 0) {
         error("Cant seek file to swap records 5");
     }
     if(fwrite(buff2, sizeof(char), bufforSize, file) < 0) {
-        error("Cant write in file to swap records 6")
+        error("Cant write in file to swap records 6");
     }
     if(fseek(file, j * bufforSize, SEEK_SET) < 0) {
         error("Cant seek file to swap records 7");
     }
     if(fwrite(buff1, sizeof(char), bufforSize, file) < 0) {
-        error("Cant write in file to swap records 8")
+        error("Cant write in file to swap records 8");
     }
     free(buff1);
     free(buff2);
