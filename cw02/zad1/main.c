@@ -20,6 +20,16 @@ void start() {
     startTime = times(&startTms);
 }
 
+void parseGenerate(char *argv[], int i, int argc) {
+    if(i + 3 >= argc) {
+        error("Wrong number of argument in generate");
+    }
+    char * fileName = argv[i + 1];
+    int numOfRecords = argv[i + 2];
+    int recordSize = argv[i + 3];
+    generate(fileName, numOfRecords, recordSize);
+}
+
 void generate(char * fileName, int numOfRecords, int recordSize) {
     int size = 100;
     char command[size];
