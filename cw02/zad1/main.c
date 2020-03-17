@@ -8,9 +8,16 @@
 #include <time.h>
 #include <sys/times.h>
 
+clock_t startTime, endTime;
+struct tms startTms, endTms;
+
 void error(char *message) {
     perror(message);
     exit(-1);
+}
+
+void start() {
+    startTime = times(&startTms);
 }
 
 void generate(char * fileName, int numOfRecords, int recordSize) {
@@ -243,3 +250,4 @@ void libSwapInFile(FILE * file, int numOfRecords, int recordSize, int i, int j) 
     free(buff1);
     free(buff2);
 }
+
