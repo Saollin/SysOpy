@@ -46,6 +46,23 @@ void parseSorting(char *argv[], int i, int argc) {
     }
 }
 
+void parseCopying(char *argv[], int i, int argc) {
+    if(i + 5 > argc) {
+        error("Wrong number of argument in copy");
+    }
+    char * fileFrom = argv[i + 1];
+    char * fileTo = argv[i + 2];
+    int numOfRecords = atoi(argv[i + 3]);
+    int recordSize = atoi(argv[i + 4]);
+    char * mode = argv[i + 5];
+    if(!strcmp(mode, "sys")) {
+        sysCopy(fileFrom, fileTo, numOfRecords, recordSize);
+    }
+    if(!strcmp(mode, "lib")) {
+        libCopy(fileFrom, fileTo, numOfRecords, recordSize);
+    }
+}
+
 void generate(char * fileName, int numOfRecords, int recordSize) {
     int size = 100;
     char command[size];
