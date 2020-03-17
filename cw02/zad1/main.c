@@ -25,8 +25,8 @@ void parseGenerating(char *argv[], int i, int argc) {
         error("Wrong number of argument in generate");
     }
     char * fileName = argv[i + 1];
-    int numOfRecords = argv[i + 2];
-    int recordSize = argv[i + 3];
+    int numOfRecords = atoi(argv[i + 2]);
+    int recordSize = atoi(argv[i + 3]);
     generate(fileName, numOfRecords, recordSize);
 }
 
