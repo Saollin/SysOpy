@@ -30,6 +30,22 @@ void parseGenerating(char *argv[], int i, int argc) {
     generate(fileName, numOfRecords, recordSize);
 }
 
+void parseSorting(char *argv[], int i, int argc) {
+    if(i + 4 > argc) {
+        error("Wrong number of argument in sort");
+    }
+    char * fileName = argv[i + 1];
+    int numOfRecords = atoi(argv[i + 2]);
+    int recordSize = atoi(argv[i + 3]);
+    char * mode = argv[i + 4];
+    if(!strcmp(mode, "sys")) {
+        sysSort(fileName, numOfRecords, recordSize);
+    }
+    if(!strcmp(mode, "lib")) {
+        libSort(fileName, numOfRecords, recordSize);
+    }
+}
+
 void generate(char * fileName, int numOfRecords, int recordSize) {
     int size = 100;
     char command[size];
