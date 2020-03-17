@@ -1,0 +1,114 @@
+Simple test
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+
+
+
+Small count of similiar files - saving
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.010000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting 2 blocks
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting and removing 3 times
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.010000	            0.000000	            0.000000	            0.000000	            0.000000
+
+
+
+Medium count of similiar files - saving
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.020000	            0.000000	            0.000000	            0.010000	            0.000000
+deleting 4 blocks
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting and removing 3 times
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+
+
+
+Big count of similiar files - saving
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.040000	            0.000000	            0.000000	            0.020000	            0.000000
+deleting 4 blocks
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting and removing 3 times
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.010000	            0.000000
+
+
+
+Small count of half-similiar files - saving
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting 2 blocks
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting and removing 4 times
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.010000	            0.000000	            0.000000	            0.000000	            0.000000
+
+
+
+Medium count of half-similiar files - saving
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.020000	            0.000000	            0.000000	            0.010000	            0.000000
+deleting 4 blocks
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting and removing 4 times
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+
+
+
+Big count of half-similiar files - saving
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.040000	            0.000000	            0.000000	            0.020000	            0.000000
+deleting 5 blocks
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting and removing 4 times
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.010000	            0.000000
+
+
+
+Small count of non-similiar files - saving
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.140000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting 2 blocks
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting and removing 4 times
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.020000	            0.000000	            0.000000	            0.010000	            0.000000
+
+
+
+Medium count of non-similiar files - saving
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.050000	            0.000000	            0.000000	            0.030000	            0.000000
+deleting 2 blocks
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting and removing 4 times
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.010000	            0.000000	            0.000000	            0.010000	            0.000000
+
+
+
+Big count of non-similiar files - saving
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.100000	            0.000000	            0.000000	            0.060000	            0.020000
+deleting 2 blocks
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.000000	            0.000000	            0.000000	            0.000000	            0.000000
+deleting and removing 4 times
+            Real [s]	            User [s]	          System [s]	      Child User [s]	    Child System [s]
+            0.020000	            0.000000	            0.010000	            0.010000	            0.010000
+
+
+
