@@ -20,7 +20,7 @@ void start() {
     startTime = times(&startTms);
 }
 
-void parseGenerate(char *argv[], int i, int argc) {
+void parseGenerating(char *argv[], int i, int argc) {
     if(i + 3 >= argc) {
         error("Wrong number of argument in generate");
     }
