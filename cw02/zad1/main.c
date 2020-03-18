@@ -68,7 +68,7 @@ void generate(char * fileName, int numOfRecords, int recordSize) {
     int size = 100;
     char command[size];
 
-    snprintf(command, sizeof command, "head -c 10000000 /dev/urandom | tr -dc 'A-za-z' | fold -w %d | head -n %d > %s", recordSize, numOfRecords, fileName);
+    snprintf(command, sizeof command, "head -c 10000000 /dev/urandom | tr -dc 'A-Za-z' | fold -w %d | head -n %d > %s", recordSize, numOfRecords, fileName);
     int status = system(command);
     if (status != 0) {
         error("Error while generating");
@@ -86,7 +86,7 @@ void end() {
     "Real [s]",
     "User [s]",
     "System [s]");
-    printf("%20f\t%20f\t%20f\t%20f\t%20f\n", 
+    printf("%20f\t%20f\t%20f\n", 
     realTime,
     userTime,
     systemTime);
@@ -138,8 +138,8 @@ void libCopy(char * fileFrom, char * fileTo, int numOfRecords, int recordSize) {
         }
     }
     free(buffor);
-    close(from);
-    close(to);
+    fclose(from);
+    fclose(to);
 }
 
 void sysSort(char * fileName, int numOfRecords, int recordSize) {
@@ -228,13 +228,13 @@ void sysSwapInFile(int file, int numOfRecords, int recordSize, int i, int j) {
 }
 
 void libSort(char * fileName, int numOfRecords, int recordSize) {
-    FILE *file = Fopen(fileName, "r+");
+    FILE *file = fopen(fileName, "r+");
     if (file == NULL) {
         error("Cant open file to sort with lib functions");
     }
     libQuickSort(file, numOfRecords, numOfRecords, 0, numOfRecords - 1);
 
-    close(file);
+    fclose(file);
 }
 
 void libQuickSort(FILE * file, int numOfRecords, int recordSize, int low, int high) {
@@ -249,7 +249,7 @@ void libQuickSort(FILE * file, int numOfRecords, int recordSize, int low, int hi
     }
 }
 
-int lilbPartition(FILE * file, int numOfRecords, int recordSize, int low, int high) {
+int libPartition(FILE * file, int numOfRecords, int recordSize, int low, int high) {
     int bufforSize = recordSize + 1;
     char *buff1 = malloc(bufforSize * sizeof(char));
     char *buff2 = malloc(bufforSize * sizeof(char));
@@ -271,7 +271,7 @@ int lilbPartition(FILE * file, int numOfRecords, int recordSize, int low, int hi
         }
         if(buff2[0] < minChar) {
             i++;
-            sysSwapInFile(file, numOfRecords, recordSize, i, j);
+            libSwapInFile(file, numOfRecords, recordSize, i, j);
         }
     }
     libSwapInFile(file, numOfRecords, recordSize, i + 1, high);
