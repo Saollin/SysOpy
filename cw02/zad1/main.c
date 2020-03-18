@@ -86,7 +86,7 @@ void end(char *nameOfOperation) {
     "Real [s]",
     "User [s]",
     "System [s]");
-    printf("%20f\t%20f\t%20f\n", 
+    printf("%20f\t%20f\t%20f\t%20f\t%20f\n", 
     realTime,
     userTime,
     systemTime);
@@ -312,3 +312,26 @@ void libSwapInFile(FILE * file, int numOfRecords, int recordSize, int i, int j) 
     free(buff2);
 }
 
+int main(int argc, char * argv[]) {
+    start();
+    int i = 1;
+    while(i < argc) {
+        if(!strcmp(argv[i], "generate")) {
+            parseGenerating(argv, i, argc);
+            i += 4;
+        }
+        else if(!strcmp(argv[i], "sort")) {
+            parseSorting(argv, i, argc);
+            i += 5;
+        }
+        else if(!strcmp(argv[i], "copy")) {
+            parseCopying(argv, i, argc);
+            i += 6;
+        }
+        else {
+            error("Wrong command");
+        }
+    }
+    printf("\n\n\n");  
+    return 0; 
+}
