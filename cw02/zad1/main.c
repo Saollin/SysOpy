@@ -32,7 +32,7 @@ void parseGenerating(char *argv[], int i, int argc) {
 }
 
 void parseSorting(char *argv[], int i, int argc) {
-    if(i + 4 > argc) {
+    if(i + 5 > argc) {
         error("Wrong number of argument in sort");
     }
     char * fileName = argv[i + 1];
@@ -42,9 +42,13 @@ void parseSorting(char *argv[], int i, int argc) {
     if(!strcmp(mode, "sys")) {
         sysSort(fileName, numOfRecords, recordSize);
     }
-    if(!strcmp(mode, "lib")) {
+    else if(!strcmp(mode, "lib")) {
         libSort(fileName, numOfRecords, recordSize);
     }
+    else {
+        error("Wrong command");
+}
+    end();
 }
 
 void parseCopying(char *argv[], int i, int argc) {
@@ -62,6 +66,7 @@ void parseCopying(char *argv[], int i, int argc) {
     if(!strcmp(mode, "lib")) {
         libCopy(fileFrom, fileTo, numOfRecords, recordSize);
     }
+    end();
 }
 
 void generate(char * fileName, int numOfRecords, int recordSize) {
@@ -90,6 +95,7 @@ void end() {
     realTime,
     userTime,
     systemTime);
+    printf("\n\n\n");  
 }
 
 void sysCopy(char * fileFrom, char * fileTo, int numOfRecords, int recordSize) {
