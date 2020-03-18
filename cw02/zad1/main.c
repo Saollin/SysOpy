@@ -238,7 +238,7 @@ void libSort(char * fileName, int numOfRecords, int recordSize) {
     if (file == NULL) {
         error("Cant open file to sort with lib functions");
     }
-    libQuickSort(file, numOfRecords, numOfRecords, 0, numOfRecords - 1);
+    libQuickSort(file, numOfRecords, recordSize, 0, numOfRecords - 1);
 
     fclose(file);
 }
@@ -249,7 +249,7 @@ void libQuickSort(FILE * file, int numOfRecords, int recordSize, int low, int hi
         if(pivot != 0) {
             libQuickSort(file, numOfRecords, recordSize, 0, pivot - 1);
         }
-        if(pivot != numOfRecords) {
+        if(pivot != numOfRecords - 1) {
             libQuickSort(file, numOfRecords, recordSize, pivot + 1, high);
         }
     }
