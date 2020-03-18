@@ -68,7 +68,7 @@ void generate(char * fileName, int numOfRecords, int recordSize) {
     int size = 100;
     char command[size];
 
-    snprintf(command, sizeof command, "head -c 10000000 /dev/urandom | tr -dc 'A-Za-z' | fold -w %d | head -n %d > %s", recordSize, numOfRecords, fileName);
+    snprintf(command, sizeof command, "</dev/urandom tr -dc 'A-Za-z' | fold -w %d | head -n %d > %s", recordSize, numOfRecords, fileName);
     int status = system(command);
     if (status != 0) {
         error("Error while generating");
