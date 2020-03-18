@@ -74,6 +74,24 @@ void generate(char * fileName, int numOfRecords, int recordSize) {
     }
 }
 
+void end(char *nameOfOperation) {
+    endTime = times(&endTms);
+    int tics = sysconf(_SC_CLK_TCK);
+    double realTime = ((double)(endTime - startTime)) / tics;
+    double userTime = (double)(endTms.tms_utime - startTms.tms_utime) / tics;
+    double systemTime = (double)(endTms.tms_stime - startTms.tms_stime) / tics;
+    
+    printf("%s\n", nameOfOperation);
+    printf("%20s\t%20s\t%20s\n",
+    "Real [s]",
+    "User [s]",
+    "System [s]");
+    printf("%20f\t%20f\t%20f\n", 
+    realTime,
+    userTime,
+    systemTime);
+}
+
 void sysCopy(char * fileFrom, char * fileTo, int numOfRecords, int recordSize) {
     int bufforSize = recordSize + 1;
     int from = open(fileFrom, O_RDONLY); 
