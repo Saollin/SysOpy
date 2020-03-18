@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <sys/times.h>
+#include "main.h"
 
 clock_t startTime, endTime;
 struct tms startTms, endTms;
@@ -327,6 +328,10 @@ int main(int argc, char * argv[]) {
         else if(!strcmp(argv[i], "copy")) {
             parseCopying(argv, i, argc);
             i += 6;
+        }
+        else if(!strcmp(argv[i], "end")) {
+            end(argv[i + 1]);
+            i += 2;
         }
         else {
             error("Wrong command");
