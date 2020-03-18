@@ -338,7 +338,5 @@ int main(int argc, char * argv[]) {
             error("Wrong command");
         }
     }
-    end();
-    printf("\n\n\n");  
     return 0; 
 }
