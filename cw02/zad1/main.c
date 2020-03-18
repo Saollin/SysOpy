@@ -75,14 +75,13 @@ void generate(char * fileName, int numOfRecords, int recordSize) {
     }
 }
 
-void end(char *nameOfOperation) {
+void end() {
     endTime = times(&endTms);
     int tics = sysconf(_SC_CLK_TCK);
     double realTime = ((double)(endTime - startTime)) / tics;
     double userTime = (double)(endTms.tms_utime - startTms.tms_utime) / tics;
     double systemTime = (double)(endTms.tms_stime - startTms.tms_stime) / tics;
     
-    printf("%s\n", nameOfOperation);
     printf("%20s\t%20s\t%20s\n",
     "Real [s]",
     "User [s]",
@@ -329,14 +328,11 @@ int main(int argc, char * argv[]) {
             parseCopying(argv, i, argc);
             i += 6;
         }
-        else if(!strcmp(argv[i], "end")) {
-            end(argv[i + 1]);
-            i += 2;
-        }
         else {
             error("Wrong command");
         }
     }
+    end();
     printf("\n\n\n");  
     return 0; 
 }
