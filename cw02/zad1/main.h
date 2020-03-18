@@ -17,9 +17,7 @@ void sysQuickSort(int file, int numOfRecords, int recordSize, int low, int high)
 int sysPartition(int file, int numOfRecords, int recordSize, int low, int high);
 void sysSwapInFile(int file, int numOfRecords, int recordSize, int i, int j);
 void libSort(char * fileName, int numOfRecords, int recordSize);
-void libQuickSort(FILE * file, int numOfRecords, int recordSize, int low, int high);
-int libPartition(FILE * file, int numOfRecords, int recordSize, int low, int high);
-void libSwapInFile(FILE * file, int numOfRecords, int recordSize, int i, int j);
+int libQuickSort(FILE * file, int recordSize, int low, int high);
 int main(int argc, char * argv[]);
 
 #endif
