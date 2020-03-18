@@ -153,84 +153,102 @@ void sysSort(char * fileName, int numOfRecords, int recordSize) {
     if (file < 0) {
         error("Cant open file to sort with sys functions");
     }
-    sysQuickSort(file, numOfRecords, numOfRecords, 0, numOfRecords - 1);
+    sysQuickSort(file, recordSize, 0, numOfRecords);
 
     close(file);
 }
 
-void sysQuickSort(int file, int numOfRecords, int recordSize, int low, int high) {
-    if(low < high) {
-        int pivot = sysPartition(file, numOfRecords, recordSize, low, high);
-        if(pivot != 0) {
-            sysQuickSort(file, numOfRecords, recordSize, 0, pivot - 1);
-        }
-        if(pivot != numOfRecords) {
-            sysQuickSort(file, numOfRecords, recordSize, pivot + 1, high);
-        }
+int sysQuickSort(int file, int recordSize, int low, int high) {
+    if(high - low < 2) {
+        return 0;
     }
-}
+    long int bufforSize = recordSize + 1;
 
-int sysPartition(int file, int numOfRecords, int recordSize, int low, int high) {
-    int bufforSize = recordSize + 1;
-    char *buff1 = malloc(bufforSize * sizeof(char));
-    char *buff2 = malloc(bufforSize * sizeof(char));
-    if(lseek(file, high * bufforSize, SEEK_SET) < 0) {
+    char * buff1 = (char *) calloc(bufforSize, sizeof(char));
+    char * buff2 = (char *) calloc(bufforSize, sizeof(char));
+
+    if(lseek(file, bufforSize * (high - 1), SEEK_SET) < 0) {
         error("Cant seek file to lib sort");
     }
-    if(read(file, buff1, bufforSize) < 0) {
-        error("Cant read file to sys sort");
+    if(read(file, buff1, bufforSize) != bufforSize) {
+        free(buff1);
+        free(buff2);
+        return 1;
     }
-    unsigned char minChar = buff1[0];
-    int i = low -1;
+    int i = low - 1;
 
-    for(int j = low; j < high; j++) {
-        if(lseek(file, j * bufforSize, SEEK_SET) < 0) {
-            error("Cant seek file to lib sort");
+    for(int j = low; j < high - 1; j++) {
+        lseek(file, bufforSize * j, SEEK_SET);
+        if(read(file, buff2, bufforSize) != bufforSize) {
+            free(buff1);
+            free(buff2);
+            return 1;
         }
-        if(read(file, buff2, bufforSize) < 0) {
-            error("Cant read file to sys sort");
-        }
-        if(buff2[0] < minChar) {
+        
+        if (buff1[0] > buff2[0]) {
             i++;
-            sysSwapInFile(file, numOfRecords, recordSize, i, j);
+            lseek(file, bufforSize * i, SEEK_SET);
+            if(read(file, buff1, bufforSize) != bufforSize) {
+                free(buff1);
+                free(buff2);
+                return 1;
+            }
+
+            lseek(file, bufforSize * i, SEEK_SET);
+            if(write(file, buff2, bufforSize) != bufforSize) {
+                free(buff1);
+                free(buff2);
+                return 1;
+            }
+
+            lseek(file, bufforSize * j, SEEK_SET);
+            if(write(file, buff1, bufforSize) != bufforSize) {
+                free(buff1);
+                free(buff2);
+                return 1;
+            }
+
+            lseek(file, bufforSize * (high - 1), SEEK_SET);
+            if(read(file, buff1, bufforSize) != bufforSize) {
+                free(buff1);
+                free(buff2);
+                return 1;
+            }
         }
     }
-    sysSwapInFile(file, numOfRecords, recordSize, i + 1, high);
-    free(buff1);
-    free(buff2);
-    return (i + 1);
-}
 
-void sysSwapInFile(int file, int numOfRecords, int recordSize, int i, int j) {
-    int bufforSize = recordSize + 1;
-    char *buff1 = malloc(bufforSize * sizeof(char));
-    char *buff2 = malloc(bufforSize * sizeof(char));
-    if(lseek(file, i * bufforSize, SEEK_SET) < 0) {
-        error("Cant seek file to swap records 1");
+    i++;
+    lseek(file, bufforSize * i, SEEK_SET);
+    if(read(file, buff2, bufforSize) != bufforSize) {
+        free(buff1);
+        free(buff2);
+        return 1;
     }
-    if(read(file, buff1, bufforSize) < 0) {
-        error("Cant read file to swap records 2");
+    lseek(file, bufforSize * i, SEEK_SET);
+    if(write(file, buff1, bufforSize) != bufforSize) {
+        free(buff1);
+        free(buff2);
+        return 1;
     }
-    if(lseek(file, j * bufforSize, SEEK_SET) < 0) {
-        error("Cant seek file to swap records 3");
+
+    lseek(file, bufforSize * (high - 1), SEEK_SET);
+    if(write(file, buff2, bufforSize) != bufforSize) {
+        free(buff1);
+        free(buff2);
+        return 1;
     }
-    if(read(file, buff2, bufforSize) < 0) {
-        error("Cant read file to swap records 4");
-    }
-    if(lseek(file, i * bufforSize, SEEK_SET) < 0) {
-        error("Cant seek file to swap records 5");
-    }
-    if(write(file, buff2, bufforSize) < 0) {
-        error("Cant write in file to swap records 6");
-    }
-    if(lseek(file, j * bufforSize, SEEK_SET) < 0) {
-        error("Cant seek file to swap records 7");
-    }
-    if(write(file, buff1, bufforSize) < 0) {
-        error("Cant write in file to swap records 8");
-    }
+
     free(buff1);
     free(buff2);
+
+    if(sysQuickSort(file, recordSize, low, i) != 0) {
+        return 1;
+    }
+    if(sysQuickSort(file, recordSize, i + 1, high) != 0) {
+        return 1;
+    }
+
+    return 0;
 }
 
 void libSort(char * fileName, int numOfRecords, int recordSize) {
