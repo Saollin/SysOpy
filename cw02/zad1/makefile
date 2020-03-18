@@ -33,7 +33,13 @@ test:
 	# 	done; \
 	# done
 
-	rm -rf dane*
+small_test:
+	make clean
+	make main
+	./main generate dane $(REC) $(BYT)
+	./main copy dane dane2 $(REC) $(BYT) lib
+	./main copy dane dane3 $(REC) $(BYT) sys
+	./main sort dane $(REC) $(BYT) lib
 
 clean:
 	rm -rf dane*
