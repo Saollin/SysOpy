@@ -264,7 +264,7 @@ int libQuickSort(FILE *file, int recordSize, int low, int high) {
     }
     int i = low - 1;
 
-    for(int j = low; j < high - 1, j++) {
+    for(int j = low; j < high - 1; j++) {
         fseek(file, bufforSize * j, SEEK_SET);
         if (fread(buff2, sizeof(char), bufforSize, file) != bufforSize) {
             free(buff1);
