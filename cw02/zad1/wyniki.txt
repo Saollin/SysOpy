@@ -1,0 +1,288 @@
+
+Copying 16000 records with size 1 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.000000	            0.000000	            0.000000
+
+
+
+Copying 16000 records with size 1 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.040000	            0.000000	            0.020000
+
+
+
+Copying 32000 records with size 1 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.010000	            0.000000	            0.000000
+
+
+
+Copying 32000 records with size 1 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.070000	            0.000000	            0.070000
+
+
+
+Copying 16000 records with size 4 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.000000	            0.000000	            0.000000
+
+
+
+Copying 16000 records with size 4 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.040000	            0.010000	            0.020000
+
+
+
+Copying 32000 records with size 4 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.000000	            0.000000	            0.000000
+
+
+
+Copying 32000 records with size 4 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.080000	            0.020000	            0.050000
+
+
+
+Copying 16000 records with size 512 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.010000	            0.000000	            0.010000
+
+
+
+Copying 16000 records with size 512 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.050000	            0.000000	            0.040000
+
+
+
+Copying 32000 records with size 512 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.030000	            0.000000	            0.010000
+
+
+
+Copying 32000 records with size 512 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.090000	            0.020000	            0.070000
+
+
+
+Copying 16000 records with size 1024 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.050000	            0.000000	            0.030000
+
+
+
+Copying 16000 records with size 1024 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.080000	            0.000000	            0.070000
+
+
+
+Copying 32000 records with size 1024 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.040000	            0.000000	            0.030000
+
+
+
+Copying 32000 records with size 1024 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.090000	            0.010000	            0.080000
+
+
+
+Copying 16000 records with size 4096 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.070000	            0.010000	            0.050000
+
+
+
+Copying 16000 records with size 4096 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.080000	            0.000000	            0.070000
+
+
+
+Copying 32000 records with size 4096 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.130000	            0.010000	            0.120000
+
+
+
+Copying 32000 records with size 4096 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.150000	            0.030000	            0.110000
+
+
+
+Copying 16000 records with size 8192 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.190000	            0.030000	            0.150000
+
+
+
+Copying 16000 records with size 8192 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.230000	            0.000000	            0.220000
+
+
+
+Copying 32000 records with size 8192 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            0.540000	            0.060000	            0.470000
+
+
+
+Copying 32000 records with size 8192 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            0.450000	            0.020000	            0.420000
+
+
+
+Sorting 16000 records with size 1 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            2.380000	            1.340000	            1.040000
+
+
+
+Sorting 16000 records with size 1 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            4.260000	            2.000000	            2.150000
+
+
+
+Sorting 32000 records with size 1 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            8.140000	            5.200000	            2.830000
+
+
+
+Sorting 32000 records with size 1 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+           15.820000	            8.330000	            7.330000
+
+
+
+Sorting 16000 records with size 4 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            2.320000	            1.280000	            0.970000
+
+
+
+Sorting 16000 records with size 4 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            3.960000	            1.870000	            2.000000
+
+
+
+Sorting 32000 records with size 4 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+           10.680000	            6.600000	            4.040000
+
+
+
+Sorting 32000 records with size 4 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+           18.120000	            9.340000	            8.740000
+
+
+
+Sorting 16000 records with size 512 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            4.200000	            2.120000	            2.070000
+
+
+
+Sorting 16000 records with size 512 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            4.950000	            2.150000	            2.790000
+
+
+
+Sorting 32000 records with size 512 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+           10.960000	            5.830000	            5.090000
+
+
+
+Sorting 32000 records with size 512 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+           16.860000	            7.600000	            9.260000
+
+
+
+Sorting 16000 records with size 1024 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            3.800000	            1.880000	            1.910000
+
+
+
+Sorting 16000 records with size 1024 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            4.960000	            2.170000	            2.780000
+
+
+
+Sorting 32000 records with size 1024 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+           14.010000	            6.480000	            7.520000
+
+
+
+Sorting 32000 records with size 1024 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+           19.550000	            7.790000	           11.750000
+
+
+
+Sorting 16000 records with size 4096 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            7.500000	            2.820000	            4.670000
+
+
+
+Sorting 16000 records with size 4096 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            4.160000	            1.630000	            2.510000
+
+
+
+Sorting 32000 records with size 4096 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+           16.390000	            8.010000	            8.260000
+
+
+
+Sorting 32000 records with size 4096 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+           14.510000	            6.170000	            8.240000
+
+
+
+Sorting 16000 records with size 8192 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+            6.720000	            2.890000	            3.820000
+
+
+
+Sorting 16000 records with size 8192 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+            4.550000	            1.560000	            2.980000
+
+
+
+Sorting 32000 records with size 8192 bytes with lib functions
+            Real [s]	            User [s]	          System [s]
+           30.940000	           11.630000	           19.140000
+
+
+
+Sorting 32000 records with size 8192 bytes with sys functions
+            Real [s]	            User [s]	          System [s]
+           20.600000	            6.340000	           13.960000
+
+Im większy rozmiar rekordów (bufora) to tym funkcje systemowe są szybsze. Dla rekordów z 8192 bajtów, czas sortowania dla funkcji bibliotecznych jest prawie o połowe dłuższy od tych przy użyciu systemowych.
