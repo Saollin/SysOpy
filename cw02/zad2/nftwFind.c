@@ -7,8 +7,9 @@
 #include <ftw.h>
 #include <limits.h> //PATH_MAX
 
-int depth = INT_MAX - 1;
-int globalSgn = -1;
+int globalDepth = INT_MAX - 1;
+int globalSgn = 0;
+int globaMode = 0;
 
 void error(char *message) {
     perror(message);
