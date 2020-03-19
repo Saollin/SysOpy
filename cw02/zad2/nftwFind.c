@@ -7,6 +7,9 @@
 #include <ftw.h>
 #include <limits.h> //PATH_MAX
 
+int depth = INT_MAX - 1;
+int globalSgn = -1;
+
 void error(char *message) {
     perror(message);
     exit(-1);
@@ -41,3 +44,8 @@ void nftwPrint(const char *fullPath, const struct stat * stats){
     full_path, type, stats->st_nlink, (int) stats->st_size,toString(stats->st_atime), toString(stats->st_mtime));
 }
 
+void nftwSearch(char *dirName) {
+    char *fullPath = (char *) calloc(PATH_MAX, sizeof(char));
+    realpath(dirName, fullPath);
+    nftw(fullPath, nftwFunc, 10, FTW_PHYS);
+}
