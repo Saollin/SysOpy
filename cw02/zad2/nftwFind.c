@@ -45,7 +45,39 @@ void nftwPrint(const char *fullPath, const struct stat * stats){
 }
 
 void nftwSearch(char *dirName) {
+    nftw(*dirName, nftwFunc, 10, FTW_PHYS);
+}
+
+int nftwFunc(const char *path, const struct *stats, in fd, struct FTW *flag)
+{
+    if (ftwbuf->level > globalDepth + 1|| strcmp(fullPath, ".") == 0){
+        return 0;
+    }
+    struct tm *modTime = localtime(&stat->st_mtime);
+    struct tm *accTime = localtime(&stat->st_atime);
+
     char *fullPath = (char *) calloc(PATH_MAX, sizeof(char));
-    realpath(dirName, fullPath);
-    nftw(fullPath, nftwFunc, 10, FTW_PHYS);
+    realpath(path, fullPath);     
+    
+    switch (modeGlobal)
+        {
+        case 0:
+            nftwPrint(fullPath, stat);
+            break;
+        
+        case 1:
+            if (checkTime(accTime, sgnGlobal, nGlobal) > 0){
+                nftwPrint(fullPath, stat);
+            }
+            break;
+        
+        case 2:
+            if (checkTime(modTime, sgnGlobal, nGlobal) > 0){
+                nftwPrint(fullPath, stat);
+            }
+
+        default:
+            break;
+        }
+    return 0;
 }
