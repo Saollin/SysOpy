@@ -11,9 +11,12 @@ void error(char *message) {
     perror(message);
     exit(-1);
 }
+
 char *toString(time_t time) {
-    char *string = malloc(30 * sizeof(char));
-    strftime(string, 30, "%Y-%m-%d,%H:%M:%S", localtime(&time));
+    char *string = malloc(40 * sizeof(char));
+    if(strftime(string, 40, "%Y-%m-%d,%H:%M:%S", localtime(&time)) == 0) {
+
+    }
     return rstring;
 }
 
