@@ -20,3 +20,24 @@ char *toString(time_t time) {
     return rstring;
 }
 
+void nftwPrint(const char *fullPath, const struct stat * stats){
+
+    char *type="unknown";
+    if(S_ISREG(stats->st_mode))type="file";
+    else if(S_ISDIR(stats->st_mode))type="dir";
+    else if(S_ISCHR(stats->st_mode))type="char dev";
+    else if(S_ISBLK(stats->st_mode))type="block dev";
+    else if(S_ISFIFO(stats->st_mode))type="fifo";
+    else if(S_ISLNK(stats->st_mode))type="slink";
+    else if(S_ISSOCK(stats->st_mode))type="sock";
+
+
+    printf("Path of file: %s\n
+    Type: %s\n,
+    Links count %hu\n: 
+    Size: %d\n
+    Access time: %s\n
+    Modification time: %s\n\n",
+    full_path, type, stats->st_nlink, (int) stats->st_size,toString(stats->st_atime), toString(stats->st_mtime));
+}
+
