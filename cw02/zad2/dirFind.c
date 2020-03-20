@@ -117,25 +117,25 @@ int main(int argc, char *argv[]) {
     }
     // ./main path
     if(argc == 2) {
-        nftwSearch(argv[1]);
+        dirSearch(argv[1], 0);
     }
     else if (argc == 4) {
         // ./main path -maxdepth n
         if(!strcmp(argv[2], "-maxdepth")) {
             globalDepth = atoi(argv[3]);
-            nftwSearch(argv[1]);
+            dirSearch(argv[1], 0);
         }
         // ./main path -atime [+-]n
         else if(!strcmp(argv[2], "-atime")) {
             globalMode = 1; //atime mode
             parseTimeArgument(argv[3]);
-            nftwSearch(argv[1]);
+            dirSearch(argv[1], 0);
         }
         // ./main path -mtime [+-]n
         else if(!strcmp(argv[2], "-mtime")) {
             globalMode = 2; //mtime mode
             parseTimeArgument(argv[3]);
-            nftwSearch(argv[1]);
+            dirSearch(argv[1], 0);
         }
         else {
             printHelp("Wrong options!\n");
@@ -149,12 +149,12 @@ int main(int argc, char *argv[]) {
             if(!strcmp(argv[4], "-atime")){
                 globalMode = 1;
                 parseTimeArgument(argv[5]);
-                nftwSearch(argv[1]);
+                dirSearch(argv[1], 0);
             }
             else if(!strcmp(argv[4], "-mtime")){
                 globalMode = 2;
                 parseTimeArgument(argv[5]);
-                nftwSearch(argv[1]);
+                dirSearch(argv[1], 0);
             }
             else {
                 printHelp("Wrong options!\n");
@@ -167,6 +167,5 @@ int main(int argc, char *argv[]) {
     else {
         printHelp("Wrong options!\n");
     }
-    printf("\n\n %d", -74854 / (60 * 60 * 24));
     return 0;
 }
