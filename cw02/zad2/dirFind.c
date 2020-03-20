@@ -37,20 +37,19 @@ char *toString(time_t time) {
     return string;
 }
 
-int checkTime(time_t checkedTime, int sgn, int n){
-;
+int checkTime(time_t checkedTime){
     int delta = difftime(currentTime, checkedTime);
-    if (sgn == 0 && delta > 0){
+    if (globalSgn == 0 && delta > 0){
         int deltaDay = delta / (60 * 60 * 24);
         if (deltaDay == 0) return 1;
         else return 0;
     }
-    else if(sgn == 1)
+    else if(globalSgn == 1)
     {
         if(difftime(currentTime, checkedTime) > 0) return 1;
         else return 0;
     }
-     else if(sgn == -1)
+     else if(globalSgn == -1)
     {
         if(difftime(currentTime, checkedTime) < 0) return 1;
         else return 0;
