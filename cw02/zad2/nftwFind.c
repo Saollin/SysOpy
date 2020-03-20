@@ -125,9 +125,15 @@ void nftwSearch(char *dirName) {
 
 void parseTimeArgument(char *argument){
     globalN = abs(atoi(argument));
-    printf("%d", globalN);
+
+    time(&currentTime);
+    struct tm* timeInfo;
+    timeInfo = localtime(&currentTime);
+    timeInfo->tm_mday -= globalN;
+
     if(argument[0] == '+') {
         globalSgn = 1;      
+        timeInfo->tm_mday -= 1;      
     }
     else if(argument[0] == '-') {
         globalSgn = -1;
@@ -135,6 +141,8 @@ void parseTimeArgument(char *argument){
     else {
         globalSgn = 0;
     }
+
+    currentTime = mktime(timeInfo);
 }
 
 void printHelp(char * message) {
@@ -149,8 +157,6 @@ int main(int argc, char *argv[]) {
         printHelp(NULL);
         return 1;
     }
-
-    time(&currentTime);
     // ./main path
     if(argc == 2) {
         nftwSearch(argv[1]);
