@@ -79,6 +79,86 @@ char *joinPaths(char *path1, char * path2) {
     return resultPath;
 }
 
+void dirSearch(char *path, int depth) {
+    if(!path || depth >= globalDepth) {
+        return;
+    }
+
+    DIR *dir = opendir(path);
+    if(dir == NULL) {
+        error("Cannot open directory");
+    }
+
+    struct dirent *info;
+    char *fullPath = (char *) calloc(PATH_MAX, sizeof(char));
+    char *nextPath;
+    struct stat stats;
+    if(depth == 0) { //print first folder
+        realpath(path, fullPath);
+        if(lstat(path, &stats) < 0) {
+            error("Error in lstat");
+        }
+        switch (globalMode)
+        {
+        case 0:
+            dirPrint(fullPath, &stats);
+            break;
+
+        case 1:
+            if(checkTime(stats.st_atime)) {
+                dirPrint(fullPath, &stats);
+            }
+            break;
+
+        case 2:
+            if(checkTime(stats.st_mtime)) {
+                dirPrint(fullPath, &stats);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+    while((info = readdir(dir)) != NULL) {
+        if(!strcmp(info->d_name, ".") || !strcmp(info->d_name, "..")) {
+            continue;
+        }
+        nextPath = joinPaths(path, info->d_name);
+        realpath(nextPath, fullPath);
+        if(lstat(nextPath, &stats) < 0) {
+            error("Error in lstat");
+        }
+        switch (globalMode)
+        {
+        case 0:
+            dirPrint(fullPath, &stats);
+            break;
+
+        case 1:
+            if(checkTime(stats.st_atime)) {
+                dirPrint(fullPath, &stats);
+            }
+            break;
+
+        case 2:
+            if(checkTime(stats.st_mtime)) {
+                dirPrint(fullPath, &stats);
+            }
+            break;
+
+        default:
+            break;
+        }
+
+        if(S_ISDIR(stats.st_mode)) {
+            dirSearch(nextPath, depth + 1);
+        }
+    }
+    free(fullPath);
+    free(info);
+    closedir(dir);
+}
 
 
 void parseTimeArgument(char *argument){
