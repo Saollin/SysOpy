@@ -37,32 +37,22 @@ char *toString(time_t time) {
     return string;
 }
 
-int checkTime(struct tm *checkedTime, int sgn, int n){
-    int checked = 0;
-    checked = checkedTime->tm_mday + 31*checkedTime->tm_mon + 365*checkedTime->tm_year;
-   
-
-    struct tm *currTime;
-    currTime = localtime(&currentTime);
-
-    //dates represented as sum of days
-    int curr = 0;
-    curr = currTime->tm_mday + 31*currTime->tm_mon + 365*currTime->tm_year;
-    
-    //printf("%d  %d\n", curr, checked);
-    
-    if (sgn == 0){
-        if (curr - checked == globalN) return 1;
+int checkTime(time_t checkedTime, int sgn, int n){
+;
+    int delta = difftime(currentTime, checkedTime);
+    if (sgn == 0 && delta > 0){
+        int deltaDay = delta / (60 * 60 * 24);
+        if (deltaDay == 0) return 1;
         else return 0;
     }
     else if(sgn == 1)
     {
-        if(curr - checked > globalN) return 1;
+        if(difftime(currentTime, checkedTime) > 0) return 1;
         else return 0;
     }
      else if(sgn == -1)
     {
-        if(curr - checked < globalN) return 1;
+        if(difftime(currentTime, checkedTime) < 0) return 1;
         else return 0;
     }
     return 0;
@@ -87,11 +77,9 @@ void nftwPrint(const char *fullPath, const struct stat * stats){
 
 int nftwFunc(const char *path, const struct stat *stats, int fd, struct FTW *flag)
 {
-    if (flag->level > globalDepth + 1|| strcmp(path, ".") == 0){
+    if (flag->level > globalDepth || strcmp(path, ".") == 0){
         return 0;
     }
-    struct tm *modTime = localtime(&stats->st_mtime);
-    struct tm *accTime = localtime(&stats->st_atime);
 
     char *fullPath = (char *) calloc(PATH_MAX, sizeof(char));
     realpath(path, fullPath);     
@@ -103,13 +91,13 @@ int nftwFunc(const char *path, const struct stat *stats, int fd, struct FTW *fla
             break;
         
         case 1:
-            if (checkTime(accTime, globalSgn, globalN) > 0){
+            if (checkTime(stats->st_atime, globalSgn, globalN) > 0){
                 nftwPrint(fullPath, stats);
             }
             break;
         
         case 2:
-            if (checkTime(modTime, globalSgn, globalN) > 0){
+            if (checkTime(stats->st_mtime, globalSgn, globalN) > 0){
                 nftwPrint(fullPath, stats);
             }
 
@@ -132,7 +120,7 @@ void parseTimeArgument(char *argument){
     timeInfo->tm_mday -= globalN;
 
     if(argument[0] == '+') {
-        globalSgn = 1;      
+        globalSgn = 1;
         timeInfo->tm_mday -= 1;      
     }
     else if(argument[0] == '-') {
@@ -209,5 +197,6 @@ int main(int argc, char *argv[]) {
     else {
         printHelp("Wrong options!\n");
     }
+    printf("\n\n %d", -74854 / (60 * 60 * 24));
     return 0;
 }
