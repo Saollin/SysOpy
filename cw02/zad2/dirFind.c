@@ -74,6 +74,12 @@ void dirPrint(const char *fullPath, const struct stat * stats){
     fullPath, type, stats->st_nlink, (int) stats->st_size,toString(stats->st_atime), toString(stats->st_mtime));
 }
 
+char *joinPaths(char *path1, char * path2) {
+    char * resultPath = malloc(sizeof(char) * (strlen(path1) + strlen(path2) + 2));
+    sprintf(resultPath, "%s/%s", path1, path2);
+    return resultPath;
+}
+
 
 
 void parseTimeArgument(char *argument){
