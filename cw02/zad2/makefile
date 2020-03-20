@@ -1,5 +1,8 @@
 CC = gcc
 FLAGS = -Wall
 
-nftw:
-	$(CC) $(FLAGS) -o main nftwFind.c 
+nftw: clean
+	$(CC) $(FLAGS) -o main nftwFind.c
+
+clean: 
+	rm -f *.o main
