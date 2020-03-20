@@ -37,20 +37,19 @@ char *toString(time_t time) {
     return string;
 }
 
-int checkTime(time_t checkedTime, int sgn, int n){
-;
+int checkTime(time_t checkedTime){
     int delta = difftime(currentTime, checkedTime);
-    if (sgn == 0 && delta > 0){
+    if (globalSgn == 0 && delta > 0){
         int deltaDay = delta / (60 * 60 * 24);
         if (deltaDay == 0) return 1;
         else return 0;
     }
-    else if(sgn == 1)
+    else if(globalSgn == 1)
     {
         if(difftime(currentTime, checkedTime) > 0) return 1;
         else return 0;
     }
-     else if(sgn == -1)
+     else if(globalSgn == -1)
     {
         if(difftime(currentTime, checkedTime) < 0) return 1;
         else return 0;
@@ -91,13 +90,13 @@ int nftwFunc(const char *path, const struct stat *stats, int fd, struct FTW *fla
             break;
         
         case 1:
-            if (checkTime(stats->st_atime, globalSgn, globalN) > 0){
+            if (checkTime(stats->st_atime) > 0){
                 nftwPrint(fullPath, stats);
             }
             break;
         
         case 2:
-            if (checkTime(stats->st_mtime, globalSgn, globalN) > 0){
+            if (checkTime(stats->st_mtime) > 0){
                 nftwPrint(fullPath, stats);
             }
 
@@ -197,6 +196,5 @@ int main(int argc, char *argv[]) {
     else {
         printHelp("Wrong options!\n");
     }
-    printf("\n\n %d", -74854 / (60 * 60 * 24));
     return 0;
 }
