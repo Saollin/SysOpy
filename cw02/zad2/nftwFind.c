@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 500
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -32,7 +34,7 @@ char *toString(time_t time) {
     if(strftime(string, 40, "%Y-%m-%d,%H:%M:%S", localtime(&time)) == 0) {
 
     }
-    return rstring;
+    return string;
 }
 
 int checkTime(struct tm *checkedTime, int sgn, int n){
@@ -78,26 +80,18 @@ void nftwPrint(const char *fullPath, const struct stat * stats){
     else if(S_ISSOCK(stats->st_mode))type="sock";
 
 
-    printf("Path of file: %s\n
-    Type: %s\n,
-    Links count %hu\n: 
-    Size: %d\n
-    Access time: %s\n
-    Modification time: %s\n\n",
-    full_path, type, stats->st_nlink, (int) stats->st_size,toString(stats->st_atime), toString(stats->st_mtime));
+    printf("Path of file: %s\nType: %s\nLinks count: %lu\nSize: %d\nAccess time: %s\nModification time: %s\n\n",
+    fullPath, type, stats->st_nlink, (int) stats->st_size,toString(stats->st_atime), toString(stats->st_mtime));
 }
 
-void nftwSearch(char *dirName) {
-    nftw(*dirName, nftwFunc, 10, FTW_PHYS);
-}
 
-int nftwFunc(const char *path, const struct *stats, in fd, struct FTW *flag)
+int nftwFunc(const char *path, const struct stat *stats, int fd, struct FTW *flag)
 {
-    if (ftwbuf->level > globalDepth + 1|| strcmp(fullPath, ".") == 0){
+    if (flag->level > globalDepth + 1|| strcmp(path, ".") == 0){
         return 0;
     }
-    struct tm *modTime = localtime(&stat->st_mtime);
-    struct tm *accTime = localtime(&stat->st_atime);
+    struct tm *modTime = localtime(&stats->st_mtime);
+    struct tm *accTime = localtime(&stats->st_atime);
 
     char *fullPath = (char *) calloc(PATH_MAX, sizeof(char));
     realpath(path, fullPath);     
@@ -105,18 +99,18 @@ int nftwFunc(const char *path, const struct *stats, in fd, struct FTW *flag)
     switch (globalMode)
         {
         case 0:
-            nftwPrint(fullPath, stat);
+            nftwPrint(fullPath, stats);
             break;
         
         case 1:
             if (checkTime(accTime, globalSgn, globalN) > 0){
-                nftwPrint(fullPath, stat);
+                nftwPrint(fullPath, stats);
             }
             break;
         
         case 2:
             if (checkTime(modTime, globalSgn, globalN) > 0){
-                nftwPrint(fullPath, stat);
+                nftwPrint(fullPath, stats);
             }
 
         default:
@@ -125,8 +119,13 @@ int nftwFunc(const char *path, const struct *stats, in fd, struct FTW *flag)
     return 0;
 }
 
+void nftwSearch(char *dirName) {
+    nftw(dirName, nftwFunc, 10, FTW_PHYS);
+}
+
 void parseTimeArgument(char *argument){
     globalN = abs(atoi(argument));
+    printf("%d", globalN);
     if(argument[0] == '+') {
         globalSgn = 1;      
     }
@@ -134,12 +133,12 @@ void parseTimeArgument(char *argument){
         globalSgn = -1;
     }
     else {
-        globalSgn = 1;
+        globalSgn = 0;
     }
 }
 
 void printHelp(char * message) {
-    printf("Usage of program is ./programName path [-maxdepth depth] [-atime n or -mtime n]\n");
+    printf("Usage of program is: \n ./main path [-maxdepth depth] [-atime n or -mtime n]\n");
     if(message != NULL) {
         error(message);
     }
@@ -158,7 +157,7 @@ int main(int argc, char *argv[]) {
     }
     else if (argc == 4) {
         // ./main path -maxdepth n
-        if(!strcmp(argv[2], "-maxdepth") {
+        if(!strcmp(argv[2], "-maxdepth")) {
             globalDepth = atoi(argv[3]);
             nftwSearch(argv[1]);
         }
@@ -204,4 +203,5 @@ int main(int argc, char *argv[]) {
     else {
         printHelp("Wrong options!\n");
     }
+    return 0;
 }
