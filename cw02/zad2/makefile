@@ -26,6 +26,8 @@ test:
 	find .. -maxdepth 2 -atime 1
 	./main .. -maxdepth 2 -atime 1
 
+	make clean
+	
 nftw: clean
 	$(CC) $(FLAGS) -o main nftwFind.c
 
