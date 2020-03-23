@@ -15,13 +15,13 @@ void correctInt(int *n, int min, int max) {
     *n = ((*n) % (max - min + 1)) + min;
 }
 
-void writeToFile(char * filePath, int col, int row, FILE * randomGenerator) {
+void writeToFile(char * filePath, int col, int row) {
     FILE * file = fopen(filePath, "w");
     int randInt;
 
     for(int i = 0; i < row; i++) {
         for(int j = 0; j < col; j++) {
-            fread(&randInt, sizeof(int), 1, randomGenerator);
+            randInt = rand();
             correctInt(&randInt, -100, 100);
             fprintf(file, "%d", randInt);
             if(j == col - 1) {
@@ -51,19 +51,16 @@ int main(int argc, char *argv[]) {
         maxGlob = tmp;
     }
 
-    FILE *random = fopen("/dev/random", "r");
-    if(random == NULL) {
-        printf("Can't open /dev/random\n");
-        exit(1);
-    }
+    time_t t;
+    srand((unsigned) time(&t));
     for(int i = 0; i < numberOfPairs; i++) {
-        int col1, row1, row2; //row1 = col2
-        fread(&col1, sizeof(int), 1, random);
-        fread(&row1, sizeof(int), 1, random); 
-        fread(&row2, sizeof(int), 1, random); 
+        int col1, row1, col2; //row1 = col2
+        col1 = rand();
+        row1 = rand();
+        col2 = rand();
         correctInt(&col1, minGlob, maxGlob);
         correctInt(&row1, minGlob, maxGlob);
-        correctInt(&row2, minGlob, maxGlob);
+        correctInt(&col2, minGlob, maxGlob);
         
         char fileA[15], fileB[15], resultFile[15];
         sprintf(fileA, "m%d_A.txt", i + 1);
@@ -78,10 +75,9 @@ int main(int argc, char *argv[]) {
         sprintf(fullLine, "%s %s %s\n", fileA, fileB, resultFile);
         fwrite(fullLine, sizeof(char), strlen(fullLine), list);
 
-        writeToFile(fileA, col1, row1, random);
-        writeToFile(fileB, row1, row2, random);
+        writeToFile(fileA, col1, row1);
+        writeToFile(fileB, col2, col1);
     }
-    fclose(random);
     fclose(list);
     return 0;
 }
