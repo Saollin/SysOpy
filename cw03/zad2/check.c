@@ -21,6 +21,17 @@ void parseMatrix(int **A, FILE * matrixFile, int colNumber) {
     }
 }
 
+
+void countNumberOfPairs(FILE * list) {
+    fseek(list,0,SEEK_SET);
+    char buffer[500];
+    numberOfPairs = 0;
+    if(list != NULL) {
+        while(fgets(buffer,sizeof(buffer), list) != NULL)
+            numberOfPairs++;
+    }
+}
+
 void checkMatrixesInPair(int pair, FILE * list) {
     //parsing
     int **matrixA;
@@ -69,9 +80,6 @@ void checkMatrixesInPair(int pair, FILE * list) {
         printf("The multiplication had too little time!\n");
         return;
     }
-    fseek(result,0,SEEK_SET);
-    
-    fseek(b,0,SEEK_SET);
     
     matrixA = (int **)calloc(rows1,sizeof(int *));
     matrixB = (int **)calloc(rows2,sizeof(int *));
@@ -112,13 +120,13 @@ void checkMatrixesInPair(int pair, FILE * list) {
 
 
 int main(int argc, char *argv[]) {
-    if(argc != 3) {
-        printf("WRONG NUMBER OF PARAMETERS!\n");
+    if(argc != 2) {
+        printf("Wrong number of arguments!\n");
         return -1;
     }
     char *fileName = argv[1];
     FILE *list = fopen(fileName,"r");
-    numberOfPairs=atoi(argv[2]);
+    countNumberOfPairs(list);
 
     for(int i=0; i<numberOfPairs; i++) {
         checkMatrixesInPair(i+1, list);
