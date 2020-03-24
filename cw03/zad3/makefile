@@ -4,12 +4,12 @@ RESULT_FILE = raport3.txt
 
 all: clean_all compile_all
 	echo "Raport file" > $(RESULT_FILE)
-	echo "mode == 0 -> working with many files (use funciton paste)" >> $(RESULT_FILE)
+	echo "mode == 0 -> working with many files (use function paste)" >> $(RESULT_FILE)
 	echo "mode == 1 -> working with one file" >> $(RESULT_FILE)
 	
-	echo "Pairs: 10, Range: 10-12, Processes: 2, Time: 1s, Mode: 0, Max CPU time: 2s, Max memory: 10 MB" >> $(RESULT_FILE)
-	./generator 10 10 12
-	./matrix list.txt 2 1 0 2 10 >> $(RESULT_FILE)
+	echo "Pairs: 10, Range: 10-12, Processes: 2, Time: 1s, Mode: 0, Max CPU time: 1s, Max memory: 10 MB" >> $(RESULT_FILE)
+	./generator 20 10 12
+	./matrix list.txt 2 1 0 1 10 >> $(RESULT_FILE)
 	./check list.txt >> $(RESULT_FILE)
 	make clean
 
@@ -18,18 +18,6 @@ all: clean_all compile_all
 	./matrix list.txt 2 2 1 1 5 >> $(RESULT_FILE)
 	./check list.txt >> $(RESULT_FILE)
 	make clean
-
-	# echo "Pairs: 10, Range: 30-40, Processes: 2, Time: 2s, Mode: 0" >> $(RESULT_FILE)
-	# ./generator 10 30 40
-	# ./matrix list.txt 2 2 0 >> $(RESULT_FILE)
-	# ./check list.txt >> $(RESULT_FILE)
-	# make clean
-
-	# echo "Pairs: 50, Range: 20-30, Processes: 5, Time: 5s, Mode: 0" >> $(RESULT_FILE)
-	# ./generator 50 20 30
-	# ./matrix list.txt 5 5 0 >> $(RESULT_FILE)
-	# ./check list.txt >> $(RESULT_FILE)
-	# make clean
 
 compile_all:
 	$(CC) $(FLAGS) -o generator generator.c

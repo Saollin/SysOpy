@@ -1,0 +1,57 @@
+Raport file
+mode == 0 -> working with many files (use function paste)
+mode == 1 -> working with one file
+Pairs: 10, Range: 10-12, Processes: 2, Time: 1s, Mode: 0, Max CPU time: 1s, Max memory: 10 MB
+The process with PID = 26590 have made 20 multiplications
+User CPU time: 0.515410 (seconds), System CPU time: 0.101609 (seconds), Maximum resident set size:  1.748000 (MB)
+
+The process with PID = 27864 have made 20 multiplications
+User CPU time: 0.486664 (seconds), System CPU time: 0.103093 (seconds), Maximum resident set size:  1.748000 (MB)
+
+
+
+The pair no 1 was counted correctly!
+The pair no 2 was counted correctly!
+The pair no 3 was counted correctly!
+The pair no 4 was counted correctly!
+The pair no 5 was counted correctly!
+The pair no 6 was counted correctly!
+The pair no 7 was counted correctly!
+The pair no 8 was counted correctly!
+The pair no 9 was counted correctly!
+The pair no 10 was counted correctly!
+The pair no 11 was counted correctly!
+The pair no 12 was counted correctly!
+The pair no 13 was counted correctly!
+The pair no 14 was counted correctly!
+The pair no 15 was counted correctly!
+The pair no 16 was counted correctly!
+The pair no 17 was counted correctly!
+The pair no 18 was counted correctly!
+The pair no 19 was counted correctly!
+The pair no 20 was counted correctly!
+
+
+
+Pairs: 10, Range: 30-40, Processes: 2, Time: 2s, Mode: 1, Max CPU time: 1s, Max memory: 5 MB
+The process with PID = 29506 have made 2 multiplications
+User CPU time: 1.812114 (seconds), System CPU time: 0.453034 (seconds), Maximum resident set size:  2.860000 (MB)
+
+The process with PID = 32015 have made 2 multiplications
+User CPU time: 1.758344 (seconds), System CPU time: 0.454951 (seconds), Maximum resident set size:  2.900000 (MB)
+
+
+
+The pair no 1 was counted correctly!
+The pair no 2 was counted correctly!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+
+
+
