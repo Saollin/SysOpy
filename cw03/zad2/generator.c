@@ -6,7 +6,7 @@
 
 int minGlob,maxGlob; 
 
-void correctInt(int *n, int min, int max) {
+void countRightInt(int *n, int min, int max) {
     if(*n == INT_MIN) {
         *n = *n + 1;
     }
@@ -22,7 +22,7 @@ void writeToFile(char * filePath, int col, int row) {
     for(int i = 0; i < row; i++) {
         for(int j = 0; j < col; j++) {
             randInt = rand();
-            correctInt(&randInt, -100, 100);
+            countRightInt(&randInt, -100, 100);
             fprintf(file, "%d", randInt);
             if(j == col - 1) {
                 fprintf(file, "\n");
@@ -58,20 +58,20 @@ int main(int argc, char *argv[]) {
         col1 = rand();
         row1 = rand();
         col2 = rand();
-        correctInt(&col1, minGlob, maxGlob);
-        correctInt(&row1, minGlob, maxGlob);
-        correctInt(&col2, minGlob, maxGlob);
+        countRightInt(&col1, minGlob, maxGlob);
+        countRightInt(&row1, minGlob, maxGlob);
+        countRightInt(&col2, minGlob, maxGlob);
         
-        char fileA[15], fileB[15], resultFile[15];
+        char fileA[20], fileB[20], resultFile[20];
         sprintf(fileA, "m%d_A.txt", i + 1);
         sprintf(fileB, "m%d_B.txt", i + 1);
         sprintf(resultFile, "m%d_result.txt", i + 1);
 
         char command[30];
         sprintf(command, "touch %s", resultFile); // creating resultFile
-        
+        system(command);
         //save in argument file
-        char fullLine[45];
+        char fullLine[60];
         sprintf(fullLine, "%s %s %s\n", fileA, fileB, resultFile);
         fwrite(fullLine, sizeof(char), strlen(fullLine), list);
 
