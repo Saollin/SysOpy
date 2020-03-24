@@ -10,25 +10,25 @@ all: clean_all compile_all
 	echo "Pairs: 10, Range: 10-12, Processes: 2, Time: 1s, Mode: 0" >> $(RESULT_FILE)
 	./generator 10 10 12
 	./matrix list.txt 2 1 0 >> $(RESULT_FILE)
-	./check list.txt 10 >> $(RESULT_FILE)
+	./check list.txt >> $(RESULT_FILE)
 	make clean
 
-	echo "Pairs: 10, Range: 30-40, Processes: 10, Time: 1s, Mode: 1" >> $(RESULT_FILE)
+	echo "Pairs: 10, Range: 30-40, Processes: 2, Time: 2s, Mode: 1" >> $(RESULT_FILE)
 	./generator 10 30 40
-	./matrix list.txt 10 1 1 >> $(RESULT_FILE)
-	./check list.txt 10 >> $(RESULT_FILE)
+	./matrix list.txt 2 2 1 >> $(RESULT_FILE)
+	./check list.txt >> $(RESULT_FILE)
 	make clean
 
-	echo "Pairs: 10, Range: 30-40, Processes: 10, Time: 1s, Mode: 0" >> $(RESULT_FILE)
+	echo "Pairs: 10, Range: 30-40, Processes: 2, Time: 2s, Mode: 0" >> $(RESULT_FILE)
 	./generator 10 30 40
-	./matrix list.txt 10 1 0 >> $(RESULT_FILE)
-	./check list.txt 10 >> $(RESULT_FILE)
+	./matrix list.txt 2 2 0 >> $(RESULT_FILE)
+	./check list.txt >> $(RESULT_FILE)
 	make clean
 
 	echo "Pairs: 50, Range: 20-30, Processes: 5, Time: 5s, Mode: 0" >> $(RESULT_FILE)
 	./generator 50 20 30
 	./matrix list.txt 5 5 0 >> $(RESULT_FILE)
-	./check list.txt 50 >> $(RESULT_FILE)
+	./check list.txt >> $(RESULT_FILE)
 	make clean
 
 compile_all:
