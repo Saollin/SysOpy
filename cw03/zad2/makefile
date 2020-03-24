@@ -2,24 +2,7 @@ CC = gcc
 FLAGS = -Wall
 RESULT_FILE = raport.txt
 
-compile_all:
-	$(CC) $(FLAGS) -o generator generator.c
-	$(CC) $(FLAGS) -o matrix matrix.c
-	$(CC) $(FLAGS) -o check check.c
-
-
-clean:
-	rm -f m*.txt result* list.txt
-	
-clean_all: clean
-	rm -f matrix generator check 
-
-debug:
-	$(CC) $(FLAGS) -g generator generator.c
-	gdb ./generator 100 20 30
-
-
-test: clean_all compile_all
+all: clean_all compile_all
 	echo "Raport file" > $(RESULT_FILE)
 	echo "mode == 0 -> working with many files (use funciton paste)" >> $(RESULT_FILE)
 	echo "mode == 1 -> working with one file" >> $(RESULT_FILE)
@@ -47,3 +30,21 @@ test: clean_all compile_all
 	./matrix list.txt 5 5 0 >> $(RESULT_FILE)
 	./check list.txt 50 >> $(RESULT_FILE)
 	make clean
+
+compile_all:
+	$(CC) $(FLAGS) -o generator generator.c
+	$(CC) $(FLAGS) -o matrix matrix.c
+	$(CC) $(FLAGS) -o check check.c
+
+
+clean:
+	rm -f m*.txt result* list.txt
+	
+clean_all: clean
+	rm -f matrix generator check 
+
+debug:
+	$(CC) $(FLAGS) -g generator generator.c
+	gdb ./generator 100 20 30
+
+

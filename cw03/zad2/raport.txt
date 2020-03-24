@@ -2,133 +2,133 @@ Raport file
 mode == 0 -> working with many files (use funciton paste)
 mode == 1 -> working with one file
 Pairs: 10, Range: 10-12, Processes: 2, Time: 1s, Mode: 0
-The process with PID = 28672 have made 10 multiplications
-The process with PID = 29298 have made 10 multiplications
+The process with PID = 20406 have made 10 multiplications
+The process with PID = 21038 have made 10 multiplications
 
 
-This multiplication of pair no 1 on the list went correctly!
-This multiplication of pair no 2 on the list went correctly!
-This multiplication of pair no 3 on the list went correctly!
-This multiplication of pair no 4 on the list went correctly!
-This multiplication of pair no 5 on the list went correctly!
-This multiplication of pair no 6 on the list went correctly!
-This multiplication of pair no 7 on the list went correctly!
-This multiplication of pair no 8 on the list went correctly!
-This multiplication of pair no 9 on the list went correctly!
-This multiplication of pair no 10 on the list went correctly!
+The pair no 1 was counted correctly!
+The pair no 2 was counted correctly!
+The pair no 3 was counted correctly!
+The pair no 4 was counted correctly!
+The pair no 5 was counted correctly!
+The pair no 6 was counted correctly!
+The pair no 7 was counted correctly!
+The pair no 8 was counted correctly!
+The pair no 9 was counted correctly!
+The pair no 10 was counted correctly!
 
 
 
 Pairs: 10, Range: 30-40, Processes: 10, Time: 1s, Mode: 1
-The process with PID = 30270 have made 3 multiplications
-The process with PID = 31161 have made 5 multiplications
-The process with PID = 32642 have made 3 multiplications
-The process with PID = 1161 have made 5 multiplications
-The process with PID = 2830 have made 5 multiplications
-The process with PID = 4555 have made 5 multiplications
-The process with PID = 6202 have made 5 multiplications
-The process with PID = 7695 have made 4 multiplications
-The process with PID = 9111 have made 4 multiplications
-The process with PID = 10454 have made 0 multiplications
+The process with PID = 22069 have made 2 multiplications
+The process with PID = 22694 have made 1 multiplications
+The process with PID = 23008 have made 2 multiplications
+The process with PID = 23633 have made 5 multiplications
+The process with PID = 25108 have made 2 multiplications
+The process with PID = 25733 have made 1 multiplications
+The process with PID = 26052 have made 2 multiplications
+The process with PID = 26870 have made 4 multiplications
+The process with PID = 28194 have made 6 multiplications
+The process with PID = 29712 have made 0 multiplications
 
 
-This multiplication of pair no 1 on the list went correctly!
-This multiplication of pair no 2 on the list went correctly!
-This multiplication of pair no 3 on the list went correctly!
-The multiplication didn't manage to end in given time! Give it more time please!
-The multiplication didn't manage to end in given time! Give it more time please!
-The multiplication didn't manage to end in given time! Give it more time please!
-The multiplication didn't manage to end in given time! Give it more time please!
-The multiplication didn't manage to end in given time! Give it more time please!
-The multiplication didn't manage to end in given time! Give it more time please!
-The multiplication didn't manage to end in given time! Give it more time please!
+The pair no 1 was counted correctly!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
 
 
 
 Pairs: 10, Range: 30-40, Processes: 10, Time: 1s, Mode: 0
-The process with PID = 11778 have made 10 multiplications
-The process with PID = 13123 have made 10 multiplications
-The process with PID = 14408 have made 10 multiplications
-The process with PID = 15689 have made 10 multiplications
-The process with PID = 16970 have made 10 multiplications
-The process with PID = 18280 have made 10 multiplications
-The process with PID = 19561 have made 10 multiplications
-The process with PID = 20842 have made 10 multiplications
-The process with PID = 22136 have made 10 multiplications
-The process with PID = 23172 have made 0 multiplications
+The process with PID = 30537 have made 10 multiplications
+The process with PID = 31959 have made 10 multiplications
+The process with PID = 965 have made 10 multiplications
+The process with PID = 2618 have made 10 multiplications
+The process with PID = 4220 have made 10 multiplications
+The process with PID = 5849 have made 10 multiplications
+The process with PID = 7275 have made 10 multiplications
+The process with PID = 8836 have made 10 multiplications
+The process with PID = 10325 have made 0 multiplications
+The process with PID = 10565 have made 0 multiplications
 
 
-This multiplication of pair no 1 on the list went correctly!
-The multiplication didn't manage to end in given time! Give it more time please!
-The multiplication didn't manage to end in given time! Give it more time please!
-This multiplication of pair no 4 on the list went correctly!
-This multiplication of pair no 5 on the list went correctly!
-The multiplication didn't manage to end in given time! Give it more time please!
-The multiplication didn't manage to end in given time! Give it more time please!
-The multiplication didn't manage to end in given time! Give it more time please!
-This multiplication of pair no 9 on the list went correctly!
-This multiplication of pair no 10 on the list went correctly!
+The pair no 1 was counted correctly!
+The multiplication had too little time!
+The pair no 3 was counted correctly!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The multiplication had too little time!
+The pair no 8 was counted correctly!
+The multiplication had too little time!
+The multiplication had too little time!
 
 
 
 Pairs: 50, Range: 20-30, Processes: 5, Time: 5s, Mode: 0
-The process with PID = 25846 have made 50 multiplications
-The process with PID = 32512 have made 50 multiplications
-The process with PID = 7398 have made 50 multiplications
-The process with PID = 14505 have made 50 multiplications
-The process with PID = 21181 have made 50 multiplications
+The process with PID = 13261 have made 50 multiplications
+The process with PID = 19863 have made 50 multiplications
+The process with PID = 26642 have made 50 multiplications
+The process with PID = 1017 have made 50 multiplications
+The process with PID = 8228 have made 50 multiplications
 
 
-This multiplication of pair no 1 on the list went correctly!
-This multiplication of pair no 2 on the list went correctly!
-This multiplication of pair no 3 on the list went correctly!
-This multiplication of pair no 4 on the list went correctly!
-This multiplication of pair no 5 on the list went correctly!
-This multiplication of pair no 6 on the list went correctly!
-This multiplication of pair no 7 on the list went correctly!
-This multiplication of pair no 8 on the list went correctly!
-This multiplication of pair no 9 on the list went correctly!
-This multiplication of pair no 10 on the list went correctly!
-This multiplication of pair no 11 on the list went correctly!
-This multiplication of pair no 12 on the list went correctly!
-This multiplication of pair no 13 on the list went correctly!
-This multiplication of pair no 14 on the list went correctly!
-This multiplication of pair no 15 on the list went correctly!
-This multiplication of pair no 16 on the list went correctly!
-This multiplication of pair no 17 on the list went correctly!
-This multiplication of pair no 18 on the list went correctly!
-This multiplication of pair no 19 on the list went correctly!
-This multiplication of pair no 20 on the list went correctly!
-This multiplication of pair no 21 on the list went correctly!
-This multiplication of pair no 22 on the list went correctly!
-This multiplication of pair no 23 on the list went correctly!
-This multiplication of pair no 24 on the list went correctly!
-This multiplication of pair no 25 on the list went correctly!
-This multiplication of pair no 26 on the list went correctly!
-This multiplication of pair no 27 on the list went correctly!
-This multiplication of pair no 28 on the list went correctly!
-This multiplication of pair no 29 on the list went correctly!
-This multiplication of pair no 30 on the list went correctly!
-This multiplication of pair no 31 on the list went correctly!
-This multiplication of pair no 32 on the list went correctly!
-This multiplication of pair no 33 on the list went correctly!
-This multiplication of pair no 34 on the list went correctly!
-This multiplication of pair no 35 on the list went correctly!
-This multiplication of pair no 36 on the list went correctly!
-This multiplication of pair no 37 on the list went correctly!
-This multiplication of pair no 38 on the list went correctly!
-This multiplication of pair no 39 on the list went correctly!
-This multiplication of pair no 40 on the list went correctly!
-This multiplication of pair no 41 on the list went correctly!
-This multiplication of pair no 42 on the list went correctly!
-This multiplication of pair no 43 on the list went correctly!
-This multiplication of pair no 44 on the list went correctly!
-This multiplication of pair no 45 on the list went correctly!
-This multiplication of pair no 46 on the list went correctly!
-This multiplication of pair no 47 on the list went correctly!
-This multiplication of pair no 48 on the list went correctly!
-This multiplication of pair no 49 on the list went correctly!
-This multiplication of pair no 50 on the list went correctly!
+The pair no 1 was counted correctly!
+The pair no 2 was counted correctly!
+The pair no 3 was counted correctly!
+The pair no 4 was counted correctly!
+The pair no 5 was counted correctly!
+The pair no 6 was counted correctly!
+The pair no 7 was counted correctly!
+The pair no 8 was counted correctly!
+The pair no 9 was counted correctly!
+The pair no 10 was counted correctly!
+The pair no 11 was counted correctly!
+The pair no 12 was counted correctly!
+The pair no 13 was counted correctly!
+The pair no 14 was counted correctly!
+The pair no 15 was counted correctly!
+The pair no 16 was counted correctly!
+The pair no 17 was counted correctly!
+The pair no 18 was counted correctly!
+The pair no 19 was counted correctly!
+The pair no 20 was counted correctly!
+The pair no 21 was counted correctly!
+The pair no 22 was counted correctly!
+The pair no 23 was counted correctly!
+The pair no 24 was counted correctly!
+The pair no 25 was counted correctly!
+The pair no 26 was counted correctly!
+The pair no 27 was counted correctly!
+The pair no 28 was counted correctly!
+The pair no 29 was counted correctly!
+The pair no 30 was counted correctly!
+The pair no 31 was counted correctly!
+The pair no 32 was counted correctly!
+The pair no 33 was counted correctly!
+The pair no 34 was counted correctly!
+The pair no 35 was counted correctly!
+The pair no 36 was counted correctly!
+The pair no 37 was counted correctly!
+The pair no 38 was counted correctly!
+The pair no 39 was counted correctly!
+The pair no 40 was counted correctly!
+The pair no 41 was counted correctly!
+The pair no 42 was counted correctly!
+The pair no 43 was counted correctly!
+The pair no 44 was counted correctly!
+The pair no 45 was counted correctly!
+The pair no 46 was counted correctly!
+The pair no 47 was counted correctly!
+The pair no 48 was counted correctly!
+The pair no 49 was counted correctly!
+The pair no 50 was counted correctly!
 
 
 

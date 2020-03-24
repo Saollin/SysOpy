@@ -219,8 +219,8 @@ void parseMode(char * modeArgument, FILE * list) {
 
 int main(int argc, char ** argv) {
     if (argc != 5) {
-        printf("Wrong number of arguments! Provide it like this\n./macierz [list] [number_of_processes] [max_time] [mode]\n");
-        printf("Wher: \nmode == 0 -> working with many files (use funciton past\n");
+        printf("Wrong number of arguments! Usage of program is like this:\n./matrix [list] [number_of_processes] [max_time] [mode]\n");
+        printf("Where: \nmode == 0 -> working with many files (use funciton past\n");
         printf("mode == 1 -> working with one file");
         return -1;
     }

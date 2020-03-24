@@ -5,12 +5,27 @@
 
 int numberOfPairs;
 
+void parseMatrix(int **A, FILE * matrixFile, int colNumber) {
+    char buf[500];
+    int j = 0;
+    fseek(matrixFile, 0, SEEK_SET);
+    while(fgets(buf,sizeof(buf),matrixFile) != NULL) {
+        int c;
+        for(int k=0; k<colNumber; k++) {
+            if (k == 0) c = atoi(strtok(buf," "));
+            else if(k == colNumber-1) c = atoi(strtok(NULL,"\n"));
+            else c = atoi(strtok(NULL," "));
+            A[j][k] = c;
+        }
+        j++;
+    }
+}
 
 void checkMatrixesInPair(int pair, FILE * list) {
     //parsing
-    int **A;
-    int **B;
-    int **Result;
+    int **matrixA;
+    int **matrixB;
+    int **matrixResult;
     int i = 0;
     char buf[500];
     fseek(list, 0, SEEK_SET);
@@ -25,70 +40,54 @@ void checkMatrixesInPair(int pair, FILE * list) {
         return;
     }
     int rows1 = 0;
-    int rows2 = 0;
+    int rows2 = 0; //also columns1
     int columns2 = 1;
-    while (fgets(buf,sizeof(buf),a) != NULL) rows1++;
-    while (fgets(buf,sizeof(buf),b) != NULL) rows2++;
-    fseek(a,0,SEEK_SET);
+    while (fgets(buf,sizeof(buf),a) != NULL) {
+        rows1++;
+    }
+    while (fgets(buf,sizeof(buf),b) != NULL) {
+        rows2++;
+    }
     fseek(b,0,SEEK_SET);
-    fseek(result, 0, SEEK_SET);
     fgets(buf,sizeof(buf),b);
-    for(int j=0; j<strlen(buf); j++)
+    for(int j=0; j<strlen(buf); j++) {
         if(buf[j] == ' ') columns2++;
-    fseek(b,0,SEEK_SET);
-    int check1 = 0;
-    int check2 = 0;
-    while (fgets(buf,sizeof(buf),result) != NULL) check1++;
-    for(int j=0; j<strlen(buf); j++)
-        if(buf[j] == ' ') check2++;
-    if(check1 != rows1 || check2 != columns2) {
-        printf("The multiplication didn't manage to end in given time! Give it more time please!\n");
+    }
+
+    int resultRow = 0;
+    int resultColumns = 0;
+    fseek(result, 0, SEEK_SET);
+    while (fgets(buf,sizeof(buf),result) != NULL) {
+        resultRow++;
+    }
+    for(int j=0; j<strlen(buf); j++){
+        if(buf[j] == ' ') {
+            resultColumns++;
+        }
+    }
+    if(resultRow != rows1 || resultColumns != columns2) {
+        printf("The multiplication had too little time!\n");
         return;
     }
     fseek(result,0,SEEK_SET);
-    A = (int **)calloc(rows1,sizeof(int *));
-    B = (int **)calloc(rows2,sizeof(int *));
-    Result = (int **)calloc(rows1,sizeof(int *));
+    
+    fseek(b,0,SEEK_SET);
+    
+    matrixA = (int **)calloc(rows1,sizeof(int *));
+    matrixB = (int **)calloc(rows2,sizeof(int *));
+    matrixResult = (int **)calloc(rows1,sizeof(int *));
     for(int j=0; j<rows1; j++) {
-        A[j] = (int *)calloc(rows2,sizeof(int));
-        Result[j] = (int *)calloc(columns2,sizeof(int));
+        matrixA[j] = (int *)calloc(rows2,sizeof(int));
+        matrixResult[j] = (int *)calloc(columns2,sizeof(int));
     }
-    for(int j=0; j<rows2; j++) B[j] = (int *)calloc(columns2,sizeof(int));
-    int j = 0;
-    while(fgets(buf,sizeof(buf),a) != NULL) {
-        int c;
-        for(int k=0; k<rows2; k++) {
-            if (k == 0) c = atoi(strtok(buf," "));
-            else if(k == rows2-1) c = atoi(strtok(NULL,"\n"));
-            else c = atoi(strtok(NULL," "));
-            A[j][k] = c;
-        }
-        j++;
+    for(int j=0; j<rows2; j++) {
+        matrixB[j] = (int *)calloc(columns2,sizeof(int));
     }
-    j=0;
-    while(fgets(buf,sizeof(buf),b) != NULL) {
-        int c;
-        for(int k=0; k<columns2; k++) {
-            if (k == 0) c = atoi(strtok(buf," "));
-            else if(k == columns2-1) c = atoi(strtok(NULL,"\n"));
-            else c = atoi(strtok(NULL," "));
-            B[j][k] = c;
-        }
-        j++;
-    }
-    j=0;
-    while(fgets(buf,sizeof(buf), result) != NULL) {
-        char *buf2 = buf;
-        while(isspace(*buf2)) buf2++;
-        int c;
-        for(int k=0; k<columns2; k++) {
-            if(k == 0) c = atoi(strtok(buf," "));
-            else if (k == columns2-1) c = atoi(strtok(NULL,"\n"));
-            else c = atoi(strtok(NULL," "));
-            Result[j][k] = c;
-        }
-        j++;
-    }
+
+    parseMatrix(matrixA, a, rows2);
+    parseMatrix(matrixB, b, columns2);
+    parseMatrix(matrixResult, result, columns2);
+    
     fclose(a);
     fclose(b);
     fclose(result);
@@ -97,18 +96,18 @@ void checkMatrixesInPair(int pair, FILE * list) {
     int error = 0;
     for (int j=0; j<rows1; j++) {
         for(int k=0; k<columns2; k++) {
-            int res = 0;
+            int result = 0;
             for (int l=0; l<rows2; l++) 
-                res += A[j][l]*B[l][k];
-            if (res != Result[j][k]) {
+                result += matrixA[j][l]*matrixB[l][k];
+            if (result != matrixResult[j][k]) {
                 error = 1;
-                break;
+                goto end;
             }
         }
-        if(error == 1) break;
     }
-    if (error == 1) printf("This multiplication of pair no %d is not correct!\n",pair);
-    else printf("This multiplication of pair no %d on the list went correctly!\n", pair);
+    end:
+    if (error == 1) printf("The pair no %d was not counted correctly!\n",pair);
+    else printf("The pair no %d was counted correctly!\n", pair);
 }
 
 
