@@ -8,10 +8,12 @@
 #include <sys/times.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h> 
 #include <sys/wait.h>
+#include <sys/resource.h>
 #include <libgen.h>
 #include <errno.h>
 
@@ -217,9 +219,13 @@ void parseMode(char * modeArgument, FILE * list) {
     }
 }
 
+double countTime(struct rusage proccesData) {
+    return proccesData.ru_utime.tv_sec + proccesData.ru_utime.tv_usec/(1e6);
+}
+
 int main(int argc, char ** argv) {
-    if (argc != 5) {
-        printf("Wrong number of arguments! Usage of program is like this:\n./matrix [list] [number_of_processes] [max_time] [mode]\n");
+    if (argc != 7) {
+        printf("Wrong number of arguments! Usage of program is like this:\n./matrix [list] [number_of_processes] [max_time] [mode] [cpuTime] [virtualMemorySize]\n");
         printf("Where: \nmode == 0 -> working with many files (use funciton past\n");
         printf("mode == 1 -> working with one file");
         return -1;
@@ -235,6 +241,11 @@ int main(int argc, char ** argv) {
     countNumberOfPairs(list);
     parseMode(argv[4], list);
 
+    int cpuTime = atoi(argv[5]);
+    int virtualMemory = atoi(argv[6]);
+
+    struct rusage childProcessesData[processesNumber];
+
     for(int i=0; i<processesNumber; i++) {
         pid_t child = fork();
         if (child == -1) {
@@ -243,14 +254,22 @@ int main(int argc, char ** argv) {
         }
         else if(child > 0) pidNumbers[i]=child;
         else {
+            struct rlimit *time = (struct rlimit *) calloc(processesNumber, sizeof(struct rlimit));
+            struct rlimit *memory = (struct rlimit *) calloc(processesNumber, sizeof(struct rlimit));
+            time->rlim_cur = time->rlim_max = cpuTime;
+            memory->rlim_cur = memory->rlim_max = virtualMemory * 1e6;
+            setrlimit(RLIMIT_AS, memory);
+            setrlimit(RLIMIT_CPU, time);
+            free(time);
+            free(memory);
             exit(processChild(i,atoi(argv[4]), list));
         }
-        pidNumbers[i]=waitpid(pidNumbers[i],&statuses[i],0);
+        pidNumbers[i]=wait4(pidNumbers[i],&statuses[i],0, &childProcessesData[i]);
     }
 
     for(int i=0; i<processesNumber; i++) {
-   
         printf("The process with PID = %d have made %d multiplications\n",(int)pidNumbers[i],WEXITSTATUS(statuses[i]));
+        printf("User CPU time: %lf (seconds), Systep CPU time: %lf (seconds), Maximum resident set size:  %lf (MB)\n\n", countTime(childProcessesData[i]),countTime(childProcessesData[i]), childProcessesData[i].ru_maxrss/(1e3));
     }
     if(mode == 0){
         writeResultToOneFile(list);
