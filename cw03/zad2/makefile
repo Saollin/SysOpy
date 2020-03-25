@@ -1,6 +1,6 @@
 CC = gcc
 FLAGS = -Wall
-RESULT_FILE = raport.txt
+RESULT_FILE = raport2.txt
 
 all: clean_all compile_all
 	echo "Raport file" > $(RESULT_FILE)

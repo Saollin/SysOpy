@@ -13,9 +13,9 @@ all: clean_all compile_all
 	./check list.txt >> $(RESULT_FILE)
 	make clean
 
-	echo "Pairs: 10, Range: 30-40, Processes: 2, Time: 2s, Mode: 1, Max CPU time: 1s, Max memory: 5 MB" >> $(RESULT_FILE)
+	echo "Pairs: 10, Range: 30-40, Processes: 2, Time: 2s, Mode: 1, Max CPU time: 1s, Max memory: 15 MB" >> $(RESULT_FILE)
 	./generator 10 30 40
-	./matrix list.txt 2 2 1 1 5 >> $(RESULT_FILE)
+	./matrix list.txt 2 2 1 1 15 >> $(RESULT_FILE)
 	./check list.txt >> $(RESULT_FILE)
 	make clean
 

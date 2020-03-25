@@ -1,6 +1,6 @@
 
 #define _POSIX_C_SOURCE 1
-#define _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE //wait4
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -254,7 +254,7 @@ int main(int argc, char ** argv) {
             struct rlimit *time = (struct rlimit *) calloc(processesNumber, sizeof(struct rlimit));
             struct rlimit *memory = (struct rlimit *) calloc(processesNumber, sizeof(struct rlimit));
             time->rlim_cur = time->rlim_max = cpuTime;
-            memory->rlim_cur = memory->rlim_max = virtualMemory * 1e7;
+            memory->rlim_cur = memory->rlim_max = virtualMemory * 1e6;
             setrlimit(RLIMIT_AS, memory);
             setrlimit(RLIMIT_CPU, time);
             free(time);
@@ -265,8 +265,8 @@ int main(int argc, char ** argv) {
     }
 
     for(int i=0; i<processesNumber; i++) {
-        printf("The process with PID = %d have made %d multiplications\n",(int)pidNumbers[i],WEXITSTATUS(statuses[i]));
-        printf("User CPU time: %lf (seconds), System CPU time: %lf (seconds), Maximum resident set size:  %lf (MB)\n\n", childProcessesData[i].ru_utime.tv_sec + childProcessesData[i].ru_utime.tv_usec/(1e6),childProcessesData[i].ru_stime.tv_sec + childProcessesData[i].ru_stime.tv_usec/(1e6), childProcessesData[i].ru_maxrss/(1e3));
+        printf("The process PID = %d have made %d multiplications\n",(int)pidNumbers[i],WEXITSTATUS(statuses[i]));
+        printf("User CPU time: %lf (seconds), System CPU time: %lf (seconds)\n\n", childProcessesData[i].ru_utime.tv_sec + childProcessesData[i].ru_utime.tv_usec/(1e6),childProcessesData[i].ru_stime.tv_sec + childProcessesData[i].ru_stime.tv_usec/(1e6));
     }
     if(mode == 0){
         writeResultToOneFile(list);

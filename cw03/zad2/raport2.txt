@@ -2,8 +2,8 @@ Raport file
 mode == 0 -> working with many files (use funciton paste)
 mode == 1 -> working with one file
 Pairs: 10, Range: 10-12, Processes: 2, Time: 1s, Mode: 0
-The process with PID = 10797 have made 10 multiplications
-The process with PID = 11471 have made 10 multiplications
+The process with PID = 26338 have made 10 multiplications
+The process with PID = 26960 have made 10 multiplications
 
 
 The pair no 1 was counted correctly!
@@ -20,8 +20,8 @@ The pair no 10 was counted correctly!
 
 
 Pairs: 10, Range: 30-40, Processes: 2, Time: 2s, Mode: 1
-The process with PID = 12559 have made 2 multiplications
-The process with PID = 14872 have made 2 multiplications
+The process with PID = 27950 have made 2 multiplications
+The process with PID = 30075 have made 2 multiplications
 
 
 The pair no 1 was counted correctly!
@@ -38,8 +38,8 @@ The multiplication had too little time!
 
 
 Pairs: 10, Range: 30-40, Processes: 2, Time: 2s, Mode: 0
-The process with PID = 17929 have made 7 multiplications
-The process with PID = 22350 have made 7 multiplications
+The process with PID = 427 have made 6 multiplications
+The process with PID = 5442 have made 7 multiplications
 
 
 The pair no 1 was counted correctly!
@@ -48,7 +48,7 @@ The pair no 3 was counted correctly!
 The pair no 4 was counted correctly!
 The pair no 5 was counted correctly!
 The pair no 6 was counted correctly!
-The pair no 7 was counted correctly!
+The multiplication had too little time!
 The multiplication had too little time!
 The multiplication had too little time!
 The multiplication had too little time!
@@ -56,11 +56,11 @@ The multiplication had too little time!
 
 
 Pairs: 50, Range: 20-30, Processes: 5, Time: 5s, Mode: 0
-The process with PID = 29401 have made 50 multiplications
-The process with PID = 3970 have made 50 multiplications
-The process with PID = 11180 have made 50 multiplications
-The process with PID = 17944 have made 50 multiplications
-The process with PID = 24713 have made 50 multiplications
+The process with PID = 12762 have made 50 multiplications
+The process with PID = 19541 have made 50 multiplications
+The process with PID = 26450 have made 50 multiplications
+The process with PID = 800 have made 50 multiplications
+The process with PID = 8407 have made 50 multiplications
 
 
 The pair no 1 was counted correctly!
