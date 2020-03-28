@@ -7,6 +7,11 @@
 #include <unistd.h>
 #include <stdbool.h> //bool
 
+void error(char *message) {
+    perror(message);
+    exit(-1);
+}
+
 void sigusrHandler(int signum){
     printf("\nOdebrano sygnal SIGUSR1\n");
 }
