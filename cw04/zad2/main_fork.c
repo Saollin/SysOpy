@@ -59,24 +59,28 @@ int main(int argc, char ** argv) {
         signal(SIGNAL, SIG_IGN);
         raise(SIGNAL);
         printf("Parent process is still running after raise. \n");
+        printf("Now will be called function fork() \n");
         raiseSignalInChildProcess();
     }
     else if(!strcmp(argv[1], "handler")) {
         signal(SIGNAL, sigusrHandler);
         raise(SIGNAL);
         // here is handler - it prints sth
+        printf("Now will be called function fork() \n");
         raiseSignalInChildProcess();
     }
     else if(!strcmp(argv[1], "mask")) {
         maskSignal();
         raise(SIGNAL);
         printf("Parent process is still running after raise. \n");
+        printf("Now will be called function fork() \n");
         raiseSignalInChildProcess();
     }
     else if(!strcmp(argv[1], "pending")) {
         maskSignal();
         raise(SIGNAL);
         checkIfSignalIsVisible();
+        printf("Now will be called function fork() \n");
         pid_t child;
         child = fork();
         if(child == 0) {
