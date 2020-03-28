@@ -63,7 +63,11 @@ int main(int argc, char ** argv) {
         raiseSignalInChildProcess();
     }
     else if(!strcmp(argv[1], "handler")) {
-        signal(SIGNAL, sigusrHandler);
+        struct sigaction act;
+        act.sa_handler = sigusrHandler;
+        sigemptyset(&act.sa_mask);
+        act.sa_flags = 0;
+        sigaction(SIGNAL, &act, NULL);
         raise(SIGNAL);
         // here is handler - it prints sth
         printf("Now will be called function fork() \n");
