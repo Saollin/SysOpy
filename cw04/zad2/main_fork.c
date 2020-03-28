@@ -25,14 +25,13 @@ void maskSignal() {
     }
 }
 
-int main(int argc, char ** argv) {
-    if(argc < 2) {
-        printf("Wrong number of arguments!\n");
-        printf("You should add one from these options: ignore, handler, mask, pedning");
-        return -1;
+void raiseSignalInChildProcess() {
+        pid_t child;
+        child = fork();
+        if(child == 0) {
+            raise(SIGNAL);
+            printf("Child process is still running after raise in parent process.\n");
     }
-    if(!strcmp(argv[1], "ignore")){
-        signal(SIGUSR1, SIG_IGN);
     }
 
 void checkIfSignalIsVisible() {
