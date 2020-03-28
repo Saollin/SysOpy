@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#define SIGNAL SIGUSR1
+
 void error(char *message) {
     perror(message);
     exit(-1);
@@ -21,7 +23,7 @@ void maskSignal() {
     sigemptyset(&newMask);
     sigaddset(&newMask, SIGUSR1);
     if(sigprocmask(SIG_SETMASK, &newMask, NULL)) {
-        error("Program has failed to set mask again");
+        error("Program has failed to set mask again. \n");
     }
 }
 
@@ -31,58 +33,61 @@ void raiseSignalInChildProcess() {
         if(child == 0) {
             raise(SIGNAL);
             printf("Child process is still running after raise in parent process.\n");
-    }
-    }
+        }
+}
 
 void checkIfSignalIsVisible() {
     sigset_t set;
             sigpending(&set);
             if(sigismember(&set, SIGNAL)) {
                 printf("SIGUSR1 is visible.\n");
-    }
+            }
             else {
                 printf("SIGUSR1 is not visible.\n");
-    }
-    }
-    else {
-        printf("Such option doesn't exist!");
-        printf("You should choose one from these options: ignore, handler, mask, pedning");
+            }
+}
+
+int main(int argc, char ** argv) {
+    if(argc < 2) {
+        printf("Wrong number of arguments!\n");
+        printf("You should add one from these options: ignore, handler, mask, pending\n");
         return -1;
     }
 
-    raise(SIGUSR1);
-    pid_t child;
 
     if(!strcmp(argv[1], "ignore")){
-        child = fork();
-        if(child == 0) {
-            raise(SIGUSR1);
-        }
+        signal(SIGNAL, SIG_IGN);
+        raise(SIGNAL);
+        printf("Parent process is still running after raise. \n");
+        raiseSignalInChildProcess();
     }
     else if(!strcmp(argv[1], "handler")) {
-        child = fork();
-        if(child == 0) {
-            raise(SIGUSR1);
-        }
+        signal(SIGNAL, sigusrHandler);
+        raise(SIGNAL);
+        // here is handler - it prints sth
+        raiseSignalInChildProcess();
     }
     else if(!strcmp(argv[1], "mask")) {
-        child = fork();
-        if(child == 0) {
-            raise(SIGUSR1);
-        }
+        maskSignal();
+        raise(SIGNAL);
+        printf("Parent process is still running after raise. \n");
+        raiseSignalInChildProcess();
     }
     else if(!strcmp(argv[1], "pending")) {
+        maskSignal();
+        raise(SIGNAL);
+        checkIfSignalIsVisible();
+        pid_t child;
         child = fork();
         if(child == 0) {
-            sigset_t set;
-            sigpending(&set);
-            if(sigismember(&set, SIGUSR1)) {
-                printf("SIGUSR1 is visible.\n");
-            }
-            else {
-                printf("SIGUSR1 is not visible.\n");
-            }
+            raise(SIGNAL);
+            checkIfSignalIsVisible();
         }
     }
-    
+    else {
+        printf("Such option doesn't exist!\n");
+        printf("You should choose one from these options: ignore, handler, mask, pending. \n");
+        return -1;
+    }
+    return 0;
 }
