@@ -69,6 +69,7 @@ int main(int argc, char ** argv) {
         act.sa_flags = 0;
         sigaction(SIGNAL, &act, NULL);
         raise(SIGNAL);
+        printf("Parent process is still running after raise. \n");
         // here is handler - it prints sth
         printf("Now will be called function fork() \n");
         raiseSignalInChildProcess();
