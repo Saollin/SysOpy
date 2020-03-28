@@ -34,14 +34,16 @@ int main(int argc, char ** argv) {
     if(!strcmp(argv[1], "ignore")){
         signal(SIGUSR1, SIG_IGN);
     }
-    else if(!strcmp(argv[1], "handler")) {
-        signal(SIGUSR1, sigusrHandler);
+
+void checkIfSignalIsVisible() {
+    sigset_t set;
+            sigpending(&set);
+            if(sigismember(&set, SIGNAL)) {
+                printf("SIGUSR1 is visible.\n");
     }
-    else if(!strcmp(argv[1], "mask")) {
-        maskSignal();
+            else {
+                printf("SIGUSR1 is not visible.\n");
     }
-    else if(!strcmp(argv[1], "pending")) {
-        maskSignal;
     }
     else {
         printf("Such option doesn't exist!");
