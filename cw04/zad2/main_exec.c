@@ -51,10 +51,6 @@ int main(int argc, char ** argv) {
         raise(SIGNAL);
         printf("Parent process is still running after raise. \n");
     }
-    else if(!strcmp(argv[1], "handler")) {
-        signal(SIGNAL, sigusrHandler);
-        raise(SIGNAL);
-    }
     else if(!strcmp(argv[1], "mask")) {
         maskSignal();
         raise(SIGNAL);
@@ -64,7 +60,6 @@ int main(int argc, char ** argv) {
         maskSignal();
         raise(SIGNAL);
         checkIfSignalIsVisible();
-        pid_t child;
     }
     else {
         printf("Such option doesn't exist!\n");
