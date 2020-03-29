@@ -12,6 +12,7 @@
 bool isSig2Catched = false;
 int receivedSignals = 0;
 pid_t senderPid;
+int signalsSentedByCatcher = -1;
 
 union sigval value = {.sival_ptr = NULL};
 
@@ -20,7 +21,7 @@ void sig1Handler(int sig) {
 }
 
 void sig2Handler(int sig, siginfo_t * info, void * ucontext) {
-    printf("Number or receiving signal: %d\n", info->si_value.sival_int);
+    signalsSentedByCatcher = info->si_value.sival_int;
     isSig2Catched = true;
 }
 
@@ -72,5 +73,9 @@ int main(int argc, char ** argv) {
 
     printf("Program sender received %d signals.\n", receivedSignals);
     printf("It should receive %d signals. \n", numberOfSignals);
+    if(!strcmp(argv[3], "sigqueue")) {
+        printf("Catcher have sended signals: %d\n", signalsSentedByCatcher);
+    }
+    printf("\n\n");
     return 0;
 }
