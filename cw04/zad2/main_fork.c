@@ -17,7 +17,8 @@ void error(char *message) {
 }
 
 void sigusrHandler(int signum){
-    printf("\nOdebrano sygnal SIGUSR1\n");
+    printf("Odebrano sygnal SIGUSR1\n");
+    return;
 }
 
 void maskSignal() {

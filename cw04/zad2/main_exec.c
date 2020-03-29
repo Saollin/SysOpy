@@ -15,7 +15,7 @@ void error(char *message) {
 }
 
 void sigusrHandler(int signum){
-    printf("\nOdebrano sygnal SIGUSR1\n");
+    printf("Odebrano sygnal SIGUSR1\n");
 }
 
 void maskSignal() {
@@ -68,5 +68,6 @@ int main(int argc, char ** argv) {
     }
     printf("Now will be called function exec.\n");
     execl("./exec", "main", argv[1], NULL);
+    printf("\n");
     return 0;
 }
