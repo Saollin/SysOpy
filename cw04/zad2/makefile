@@ -1,5 +1,5 @@
 CC = gcc
-FLAGS = -Wall
+FLAGS = -Wall -ggdb
 RAPORT_FILE = raport2.txt
 
 all: compile
@@ -31,3 +31,6 @@ test:
 
 clean:
 	rm -f main_fork main_exec exec *.o
+
+test_handler:
+	./main_fork ignore > $(RAPORT_FILE)
