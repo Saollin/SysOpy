@@ -6,15 +6,24 @@ compile: clean
 	$(CC) $(FLAGS) -o sender sender.c 
 	$(CC) $(FLAGS) -o catcher catcher.c 
 
-test: compile
-	echo "1000 signals, kill" > $(RAPORT_FILE)
-	./catcher kill - & ./sender `pidof -s catcher` 1000 kill >> $(RAPORT_FILE)
+test: 
+	echo "" > $(RAPORT_FILE)
+	make test_signals signals=1000
+	make test_signals signals=10000
+	make test_signals signals=50000	
 
-	echo "1000 signals, sigrt" >> $(RAPORT_FILE)
-	./catcher sigrt  & ./sender `pidof -s catcher` 1000 sigrt >> $(RAPORT_FILE)
+signals = 1000
+test_signals: compile
+	
+	echo "$(signals) signals, kill" >> $(RAPORT_FILE)
+	./catcher kill >> $(RAPORT_FILE) & ./sender `pidof -s catcher` $(signals) kill >> $(RAPORT_FILE)
 
-	echo "1000 signals, sigqueue" >> $(RAPORT_FILE)
-	./catcher sigqueue  & ./sender `pidof -s catcher` 1000 sigqueue >> $(RAPORT_FILE)
+	echo "$(signals) signals, sigrt" >> $(RAPORT_FILE)
+	./catcher sigrt >> $(RAPORT_FILE)  & ./sender `pidof -s catcher` $(signals) sigrt >> $(RAPORT_FILE)
+
+	echo "$(signals) signals, sigqueue" >> $(RAPORT_FILE)
+	./catcher sigqueue >> $(RAPORT_FILE) & ./sender `pidof -s catcher` $(signals) sigqueue >> $(RAPORT_FILE)
+
 
 clean:
 	rm -f sender catcher *.o
