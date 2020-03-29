@@ -1,0 +1,48 @@
+Signal name: Illegal instruction
+Signal number = 4
+An errno value: 0
+Signal code = -6
+Sending process ID (PID) = 11241
+Real user ID of sending process (UID) = 1000
+Memory location which caused fault: 0x3e800002be9
+
+
+Signal name: Floating point exception
+Signal number = 8
+An errno value: 0
+Signal code = -6
+Sending process ID (PID) = 11243
+Real user ID of sending process (UID) = 1000
+Memory location which caused fault: 0x3e800002beb
+
+
+Signal name: Segmentation fault
+Signal number = 11
+An errno value: 0
+Signal code = -6
+Sending process ID (PID) = 11245
+Real user ID of sending process (UID) = 1000
+Memory location which caused fault: 0x3e800002bed
+
+
+Signal name: Child exited
+Signal number = 17
+An errno value: 0
+Signal code = 1
+Sending process ID (PID) = 11248
+Real user ID of sending process (UID) = 1000
+User time consumed by child process: 0
+System time consumed by child process: 0
+
+
+Signal name: Stopped
+Signal number = 20
+An errno value: 0
+Signal code = -6
+Sending process ID (PID) = 11251
+Real user ID of sending process (UID) = 1000
+Exit value of child process: 0
+
+
+
+
