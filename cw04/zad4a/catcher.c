@@ -69,9 +69,10 @@ int main(int argc, char ** argv) {
     else if(!strcmp(argv[1], "sigqueue")) {
         union sigval value;
         value.sival_ptr = NULL;
+        value.sival_int = 0;
         for(int i = 0; i < receivedSignals; i++) {
-            value.sival_int = i;
             sigqueue(senderPid, SIG1, value);
+            value.sival_int++;
         }
         sigqueue(senderPid, SIG2, value);
     }
