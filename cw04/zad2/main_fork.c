@@ -6,6 +6,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
+#include <wait.h>
 
 #define SIGNAL SIGUSR1
 
@@ -33,6 +35,7 @@ void raiseSignalInChildProcess() {
         if(child == 0) {
             raise(SIGNAL);
             printf("Child process is still running after raise in parent process.\n");
+        exit(0);
         }
 }
 
@@ -61,6 +64,8 @@ int main(int argc, char ** argv) {
         printf("Parent process is still running after raise. \n");
         printf("Now will be called function fork() \n");
         raiseSignalInChildProcess();
+        waitpid(-1, NULL, WUNTRACED);
+        return 0;
     }
     else if(!strcmp(argv[1], "handler")) {
         struct sigaction act;
