@@ -11,6 +11,8 @@
 
 #define SIGNAL SIGUSR1
 
+pid_t child;
+
 void error(char *message) {
     perror(message);
     exit(-1);
@@ -24,19 +26,16 @@ void sigusrHandler(int signum){
 void maskSignal() {
     sigset_t newMask;
     sigemptyset(&newMask);
-    sigaddset(&newMask, SIGUSR1);
-    if(sigprocmask(SIG_SETMASK, &newMask, NULL)) {
+    sigaddset(&newMask, SIGNAL);
+    if(sigprocmask(SIG_BLOCK, &newMask, NULL)) {
         error("Program has failed to set mask again. \n");
     }
 }
-
 void raiseSignalInChildProcess() {
-        pid_t child;
         child = fork();
         if(child == 0) {
             raise(SIGNAL);
-            printf("Child process is still running after raise in parent process.\n");
-        exit(0);
+            printf("Child process is still running after raise in parent process.\n\n");
         }
 }
 
@@ -57,16 +56,13 @@ int main(int argc, char ** argv) {
         printf("You should add one from these options: ignore, handler, mask, pending\n");
         return -1;
     }
-
-
     if(!strcmp(argv[1], "ignore")){
         signal(SIGNAL, SIG_IGN);
         raise(SIGNAL);
         printf("Parent process is still running after raise. \n");
         printf("Now will be called function fork() \n");
+        fflush(stdout);
         raiseSignalInChildProcess();
-        waitpid(-1, NULL, WUNTRACED);
-        return 0;
     }
     else if(!strcmp(argv[1], "handler")) {
         struct sigaction act;
@@ -76,8 +72,8 @@ int main(int argc, char ** argv) {
         sigaction(SIGNAL, &act, NULL);
         raise(SIGNAL);
         printf("Parent process is still running after raise. \n");
-        // here is handler - it prints sth
         printf("Now will be called function fork() \n");
+        fflush(stdout);
         raiseSignalInChildProcess();
     }
     else if(!strcmp(argv[1], "mask")) {
@@ -85,6 +81,7 @@ int main(int argc, char ** argv) {
         raise(SIGNAL);
         printf("Parent process is still running after raise. \n");
         printf("Now will be called function fork() \n");
+        fflush(stdout);
         raiseSignalInChildProcess();
     }
     else if(!strcmp(argv[1], "pending")) {
@@ -92,9 +89,12 @@ int main(int argc, char ** argv) {
         raise(SIGNAL);
         checkIfSignalIsVisible();
         printf("Now will be called function fork() \n");
-        pid_t child;
+        fflush(stdout);
         child = fork();
         if(child == 0) {
+            checkIfSignalIsVisible();
+            printf("Now will be calling function raise in child process\n");
+            fflush(stdout);
             raise(SIGNAL);
             checkIfSignalIsVisible();
         }
