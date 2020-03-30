@@ -1,6 +1,9 @@
 CC = gcc
-FLAGS = -Wall
+FLAGS = -Wall -ggdb
 RAPORT_FILE = raport2.txt
+
+all: compile
+	make test > $(RAPORT_FILE)
 
 compile: clean
 	$(CC) $(FLAGS) -o main_fork main_fork.c
@@ -8,29 +11,26 @@ compile: clean
 	$(CC) $(FLAGS) -o exec exec.c
 
 test: compile
-	echo "Testing program witk function fork() \n" > $(RAPORT_FILE)
-	echo "\nfork ignore" >> $(RAPORT_FILE)
-	./main_fork ignore >> $(RAPORT_FILE)
+	#Testing program witk function fork()" 
+	./main_fork ignore 
 
-	echo "\nfork handler" >> $(RAPORT_FILE)
-	./main_fork handler >> $(RAPORT_FILE)
+	./main_fork handler
 
-	echo "\nfork mask" >> $(RAPORT_FILE)
-	./main_fork mask >> $(RAPORT_FILE)
+	./main_fork mask
 
-	echo "\nfork pending" >> $(RAPORT_FILE)
-	./main_fork pending >> $(RAPORT_FILE)
+	./main_fork pending
 
-	echo "Testing program witk function exec()" >> $(RAPORT_FILE)
 	
-	echo "\nexec ignore" >> $(RAPORT_FILE)
-	./main_exec ignore >> $(RAPORT_FILE)
+	#Testing program witk function exec() 
+	
+	./main_exec ignore
 
-	echo "\nexec mask" >> $(RAPORT_FILE)
-	./main_exec mask >> $(RAPORT_FILE)
+	./main_exec mask
 
-	echo "\nexec pending" >> $(RAPORT_FILE)
-	./main_exec pending >> $(RAPORT_FILE)
+	./main_exec pending
 
 clean:
 	rm -f main_fork main_exec exec *.o
+
+test_handler:
+	./main_fork ignore > $(RAPORT_FILE)
