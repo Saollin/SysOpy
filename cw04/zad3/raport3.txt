@@ -1,3 +1,18 @@
+Informacje wydrukowywane przez program:
+Signal name - nie pochodzi ze struktury siginfo_t, w programie drukowana 
+ przez funkcje strsignal(int sig);
+Signal number - numer sygnału
+An errno value - wartość błędu, bazowo 0, zmienia się dla niektórych sygnałów
+Signal code - kod sygnału, ustawiany zawsze, dla każdego sygnału
+Sending process ID (PID) - sygnał otrzymano w procesie o takim właśnie numerze PID
+Real user ID of sending process (UID) - sygnał wystąpił w procesie wywołanym 
+ przez użytkownika o takim właśnie numerze UID
+Memory location which caused fault - pole dostępnę tylko dla niektórych sygnałów
+ zawiera adres instrukcji powodującej wystąpienie błędu
+User time consumed by child process - czas użytkownika zużyty przez proces potomny
+System time consumed by child process - czas systemowy zużyty przez proces potomny
+Exit value of child process - kod wyjścia (powrotu) procesu dziecka 
+
 Signal name: Illegal instruction
 Signal number = 4
 An errno value: 0
