@@ -1,0 +1,53 @@
+Testing program witk function fork()
+
+./main_fork ignore 
+Parent process is still running after raise. 
+Now will be called function fork() 
+Child process is still running after raise in parent process.
+
+./main_fork handler
+Odebrano sygnal SIGUSR1
+Parent process is still running after raise. 
+Now will be called function fork() 
+Odebrano sygnal SIGUSR1
+Child process is still running after raise in parent process.
+
+./main_fork mask
+Parent process is still running after raise. 
+Now will be called function fork() 
+Child process is still running after raise in parent process.
+
+./main_fork pending
+SIGUSR1 is visible.
+Now will be called function fork() 
+SIGUSR1 is not visible.
+Now will be calling function raise in child process
+SIGUSR1 is visible.
+
+WNIOSKI DLA FORK 
+W procesie potomnym utworzonym przy pomocy fork() zostają odziedziczone ustawienia
+dotyczące: ignorowania sygnałów, funkcje obsługujące sygnały (handlery) oraz maski 
+sygnałów. Natomiast z poziomu procesu potomnego nie możemy zobaczyć jakie sygnały 
+oczekują w procesie przodku.
+
+
+#Testing program witk function exec() 
+
+./main_exec ignore
+Parent process is still running after raise. 
+Now will be called function exec.
+Exec process is still running after raise in parent process.
+
+./main_exec mask
+Parent process is still running after raise. 
+Now will be called function exec.
+Parent process is still running after raise. 
+
+./main_exec pending
+SIGUSR1 is visible.
+Now will be called function exec.
+SIGUSR1 is visible.
+
+WNIOSKI DLA EXEC 
+Po użyciu komendy exec w procesie zapamiętane są ustawienia dotyczące: ignorowania
+sygnałów, maski sygnałów oraz lista oczekujących procesów. 
