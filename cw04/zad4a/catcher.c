@@ -12,6 +12,10 @@
 bool isSig2Catched = false;
 int receivedSignals = 0;
 pid_t senderPid;
+// mode 1 - kill
+// mode 2 - sigrt
+// mode 3 - sigqueue
+int mode = -1;
 
 void sig1Handler(int sig) {
     receivedSignals++;
@@ -23,6 +27,18 @@ void sig2Handler(int sig, siginfo_t * info, void * ucontext) {
     isSig2Catched = true;
 }
 
+void setMode(char *modeArgument) {
+    if(!strcmp(modeArgument, "kill")) {
+        mode = 1;
+    }
+    else if(!strcmp(modeArgument, "sigrt")) {
+        mode = 2;
+    }
+    else if(!strcmp(modeArgument, "sigqueue")) {
+        mode = 3;
+    }
+}
+
 int main(int argc, char ** argv) {
     if(argc < 2) {
         printf("Wrong number of arguments!\n");
@@ -32,8 +48,10 @@ int main(int argc, char ** argv) {
     pid_t pid = getpid();
     printf("Catcher PID number: %d\n", pid);
 
+    setMode(argv[1]);
+
     int SIG1, SIG2;
-    if(!strcmp(argv[1], "sigrt")){
+    if(mode == 2){
         SIG1 = SIGRTMIN + 2;
         SIG2 = SIGRTMIN + 3;
     }
@@ -60,13 +78,13 @@ int main(int argc, char ** argv) {
 
     while(!isSig2Catched);
 
-    if(!strcmp(argv[1], "kill") || !strcmp(argv[1], "sigrt")) {
+    if(mode == 1|| mode == 2) {
         for(int i = 0; i < receivedSignals; i++) {
             kill(senderPid, SIG1);
         }
         kill(senderPid, SIG2);
     }
-    else if(!strcmp(argv[1], "sigqueue")) {
+    else if(mode == 3) {
         union sigval value;
         value.sival_ptr = NULL;
         value.sival_int = 0;
