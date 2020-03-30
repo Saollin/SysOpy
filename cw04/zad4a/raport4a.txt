@@ -1,0 +1,71 @@
+
+1000 signals, kill
+Catcher PID number: 13487
+Program catcher received 464 signals.
+Program sender received 220 signals.
+It should receive 1000 signals. 
+
+
+1000 signals, sigrt
+Catcher PID number: 13492
+Program catcher received 393 signals.
+Program sender received 1000 signals.
+It should receive 1000 signals. 
+
+
+1000 signals, sigqueue
+Catcher PID number: 13497
+Program catcher received 999 signals.
+Program sender received 999 signals.
+It should receive 1000 signals. 
+Catcher have sended signals: 999
+
+
+10000 signals, kill
+Catcher PID number: 13515
+Program catcher received 4077 signals.
+Program sender received 1876 signals.
+It should receive 10000 signals. 
+
+
+10000 signals, sigrt
+Catcher PID number: 13520
+Program catcher received 4248 signals.
+Program sender received 10000 signals.
+It should receive 10000 signals. 
+
+
+10000 signals, sigqueue
+Catcher PID number: 13525
+Program catcher received 9926 signals.
+Program sender received 9900 signals.
+It should receive 10000 signals. 
+Catcher have sended signals: 9926
+
+
+1000000 signals, kill
+Catcher PID number: 13543
+Program catcher received 424593 signals.
+Program sender received 174909 signals.
+It should receive 1000000 signals. 
+
+
+1000000 signals, sigrt
+Catcher PID number: 13548
+Program catcher received 398947 signals.
+Program sender received 248924 signals.
+It should receive 1000000 signals. 
+
+
+1000000 signals, sigqueue
+Catcher PID number: 13554
+Program catcher received 992298 signals.
+Program sender received 953030 signals.
+It should receive 1000000 signals. 
+Catcher have sended signals: 992298
+
+
+WNIOSKI
+Najmniej sygnałów gubi się przy użyciu funkcji sigqueue. Funkcje czasu
+rzeczywistego oraz SIGUSR1 I SIGUSR2 wysyłane przy pomocy funkcji kill()
+gubią się dość podobnie.
