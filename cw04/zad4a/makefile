@@ -10,7 +10,7 @@ test:
 	echo "" > $(RAPORT_FILE)
 	make test_signals signals=1000
 	make test_signals signals=10000
-	make test_signals signals=50000	
+	make test_signals signals=1000000	
 
 signals = 1000
 test_signals: compile

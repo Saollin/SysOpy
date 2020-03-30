@@ -89,8 +89,8 @@ int main(int argc, char ** argv) {
         value.sival_ptr = NULL;
         value.sival_int = 0;
         for(int i = 0; i < receivedSignals; i++) {
-            sigqueue(senderPid, SIG1, value);
             value.sival_int++;
+            sigqueue(senderPid, SIG1, value);
         }
         sigqueue(senderPid, SIG2, value);
     }
