@@ -1,0 +1,69 @@
+
+1000 signals, kill
+Catcher PID number: 5785
+Program catcher received 1000 signals.
+Program sender received 1000 signals.
+It should receive 1000 signals. 
+
+
+1000 signals, sigrt
+Catcher PID number: 5790
+Program catcher received 1000 signals.
+Program sender received 1000 signals.
+It should receive 1000 signals. 
+
+
+1000 signals, sigqueue
+Catcher PID number: 5796
+Program catcher received 1000 signals.
+Program sender received 1000 signals.
+It should receive 1000 signals. 
+Catcher have sended signals: 1000
+
+
+10000 signals, kill
+Catcher PID number: 5814
+Program catcher received 10000 signals.
+Program sender received 10000 signals.
+It should receive 10000 signals. 
+
+
+10000 signals, sigrt
+Catcher PID number: 5819
+Program catcher received 10000 signals.
+Program sender received 10000 signals.
+It should receive 10000 signals. 
+
+
+10000 signals, sigqueue
+Catcher PID number: 5824
+Program catcher received 10000 signals.
+Program sender received 10000 signals.
+It should receive 10000 signals. 
+Catcher have sended signals: 10000
+
+
+1000000 signals, kill
+Catcher PID number: 5842
+Program catcher received 1000000 signals.
+Program sender received 1000000 signals.
+It should receive 1000000 signals. 
+
+
+1000000 signals, sigrt
+Catcher PID number: 5847
+Program catcher received 1000000 signals.
+Program sender received 1000000 signals.
+It should receive 1000000 signals. 
+
+
+1000000 signals, sigqueue
+Catcher PID number: 5852
+Program catcher received 1000000 signals.
+Program sender received 1000000 signals.
+It should receive 1000000 signals. 
+Catcher have sended signals: 1000000
+
+WNIOSKI
+Widzimy, że w każdym przypadku sygnały nie gubią się i wszystkieg docierają
+tam gdzie powinny.
