@@ -3,7 +3,7 @@
 int main(int argc, char **argv) {
     if(argc != 2) {
         fprintf(stderr, "Wrong number of arguments. You should give only name of file\n");
-        return 1;
+        return -1;
     }
     char * fileName = argv[1];
 

@@ -1,0 +1,2 @@
+cat a.txt | fold -w 50 | head -n 10
+cat b.txt | tr -dc 'Aabc' | fold -w 5 | head -n 5
