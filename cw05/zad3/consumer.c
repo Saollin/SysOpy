@@ -15,14 +15,14 @@ int main(int argc, char ** argv) {
 
     char * fifoPath = argv[1];
     FILE * fifo;
-    if(fopen(fifoPath, "r")) {
+    if((fifo = fopen(fifoPath, "r")) == NULL) {
         fprintf(stderr, "Consumer have failed to open file!");
         return -1;
     }
 
     char * fileName = argv[2];
     FILE * file;
-    if(fopen(fileName, "w")) {
+    if((file = fopen(fileName, "w")) == NULL) {
         fprintf(stderr, "Consumer have failed to open file!");
         return -1;
     }
@@ -30,7 +30,7 @@ int main(int argc, char ** argv) {
     int numberOfChars = atoi(argv[3]);
     char fromFifo[numberOfChars];
 
-    while (fread(fromFifo, sizeof(char), numberOfChars, fifo))
+    while (fgets(fromFifo, numberOfChars, fifo) != NULL)
     {
         fprintf(file, "%s", fromFifo);
     }

@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h> 
 
 int main(int argc, char ** argv) {
     if (argc < 4) {
@@ -14,22 +15,30 @@ int main(int argc, char ** argv) {
     }
 
     char * fifoPath = argv[1];
-    FILE * fifo = fopen(fifoPath, "w");
+    FILE * fifo;
+    if((fifo = fopen(fifoPath, "w")) == NULL) {
+        fprintf(stderr, "Consumer have failed to open file!");
+        return -1;
+    }
 
     char * fileName = argv[2];
-    FILE * file = fopen(fileName, "r+");
+    FILE * file;
+    if((file = fopen(fileName, "r+")) == NULL) {
+        fprintf(stderr, "Consumer have failed to open file!");
+        return -1;
+    }
 
-    int numberOfChars = atoi(argv[3]);
+    int numberOfChars = atoi(argv[3]) + 1; //fgets add \0
     char fromFile[numberOfChars];
-    char toFifo[numberOfChars];
 
     pid_t processPid = getpid();
 
     srand((unsigned) time(NULL));
     int sleepTime;
-    while (fread(fromFile, sizeof(char), numberOfChars, file))
+    while (fgets(fromFile, numberOfChars, file) != NULL)
     {
-        fprintf(fifo, "#%d#%s", processPid, fromFile);
+        fprintf(fifo, "#%d#%s\n", processPid, fromFile);
+        printf("#%d#%s\n", processPid, fromFile);
         sleepTime = rand() % 3;
         sleep(sleepTime);
     }
