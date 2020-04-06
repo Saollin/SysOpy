@@ -16,14 +16,14 @@ int main(int argc, char ** argv) {
     char * fifoPath = argv[1];
     FILE * fifo;
     if((fifo = fopen(fifoPath, "r")) == NULL) {
-        fprintf(stderr, "Consumer have failed to open file!");
+        fprintf(stderr, "Consumer have failed to open fifo!\n");
         return -1;
     }
 
     char * fileName = argv[2];
     FILE * file;
     if((file = fopen(fileName, "w")) == NULL) {
-        fprintf(stderr, "Consumer have failed to open file!");
+        fprintf(stderr, "Consumer have failed to open file: %s", fileName);
         return -1;
     }
 
