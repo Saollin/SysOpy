@@ -17,14 +17,14 @@ int main(int argc, char ** argv) {
     char * fifoPath = argv[1];
     FILE * fifo;
     if((fifo = fopen(fifoPath, "w")) == NULL) {
-        fprintf(stderr, "Consumer have failed to open file!");
+        fprintf(stderr, "Producer have failed to open fifo!\n");
         return -1;
     }
 
     char * fileName = argv[2];
     FILE * file;
     if((file = fopen(fileName, "r+")) == NULL) {
-        fprintf(stderr, "Consumer have failed to open file!");
+        fprintf(stderr, "Producer have failed to open file: %s\n", fileName);
         return -1;
     }
 
@@ -38,8 +38,7 @@ int main(int argc, char ** argv) {
     while (fgets(fromFile, numberOfChars, file) != NULL)
     {
         fprintf(fifo, "#%d#%s\n", processPid, fromFile);
-        printf("#%d#%s\n", processPid, fromFile);
-        sleepTime = rand() % 3;
+        sleepTime = rand() % 2;
         sleep(sleepTime);
     }
 
