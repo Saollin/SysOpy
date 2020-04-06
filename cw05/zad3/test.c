@@ -9,16 +9,7 @@
 #include <sys/stat.h>
 
 int main(int argc, char ** argv) {
-    if(argc < 2) {
-        fprintf(stderr, "Wrong number of arguments! Give buffored chars");
-        return -1;
-    }
-
-    int numberOfChars = atoi(argv[1]);
-    char * chars = calloc(2, sizeof(char));
-    sprintf(chars, "%d", numberOfChars + 10);
-
-    char *consumer[] = {"./consumer", "fifo", "./tests/result.txt", chars, NULL};
+    char *consumer[] = {"./consumer", "fifo", "./tests/result.txt", "15", NULL};
 
     char ***producer = calloc(5, sizeof(char **));
     for(int i = 0; i < 5; i++) {
@@ -28,7 +19,7 @@ int main(int argc, char ** argv) {
         producer[i][0] ="./producer";
         producer[i][1] = "fifo"; 
         producer[i][2] = fileName;
-        producer[i][3] =  argv[1];
+        producer[i][3] =  "5";
         producer[i][4] = NULL;
     }
     
@@ -37,21 +28,11 @@ int main(int argc, char ** argv) {
 
     pid_t pids[6];
 
-
-    if ((pids[0] = fork()) == 0)
-        execvp(producer[0][0], producer[0]);
-
-    if ((pids[1] = fork()) == 0)
-        execvp(producer[1][0], producer[1]);
-
-    if ((pids[2] = fork()) == 0)
-        execvp(producer[2][0], producer[2]);
-
-    if ((pids[3] = fork()) == 0)
-        execvp(producer[3][0], producer[3]);
-
-    if ((pids[4] = fork()) == 0)
-        execvp(producer[4][0], producer[4]);
+    for(int i = 0; i < 5; i++) {
+        if((pids[i] = fork()) == 0) {
+            execvp(producer[i][0], producer[i]);
+        }
+    }
 
     if((pids[5] == fork()) == 0) {
         execvp(consumer[0], consumer);
