@@ -18,12 +18,12 @@ int main(int argc, char ** argv) {
     char * chars = calloc(2, sizeof(char));
     sprintf(chars, "%d", numberOfChars + 10);
 
-    char *consumer[6] = {"./consumer", "fifo", "./tests/result.txt", chars, NULL};
+    char *consumer[6] = {"./consumer", "fifo", "./files/result.txt", chars, NULL};
 
     char ***producer = calloc(5, sizeof(char **));
     for(int i = 0; i < 5; i++) {
         char * fileName = calloc(14, sizeof(char));
-        sprintf(fileName, "./tests/p%d.txt", i + 1);
+        sprintf(fileName, "./files/p%d.txt", i + 1);
         producer[i] = calloc(5, sizeof(char *));
         producer[i][0] ="./producer";
         producer[i][1] = "fifo"; 
