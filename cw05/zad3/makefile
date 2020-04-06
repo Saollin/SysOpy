@@ -15,7 +15,7 @@ tester:
 compile: clean producer consumer tester
 
 test:
-	./tester
+	./tester 5
 	make clean
 
 clean:
