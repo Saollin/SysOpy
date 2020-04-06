@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 
 int main(int argc, char ** argv) {
-    char *consumer[] = {"./consumer", "fifo", "./tests/result.txt", "15", NULL};
+    char *consumer[6] = {"./consumer", "fifo", "./tests/result.txt", "20", NULL};
 
     char ***producer = calloc(5, sizeof(char **));
     for(int i = 0; i < 5; i++) {
@@ -19,7 +19,7 @@ int main(int argc, char ** argv) {
         producer[i][0] ="./producer";
         producer[i][1] = "fifo"; 
         producer[i][2] = fileName;
-        producer[i][3] =  "5";
+        producer[i][3] =  "3";
         producer[i][4] = NULL;
     }
     
