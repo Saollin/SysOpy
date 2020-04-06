@@ -21,7 +21,6 @@ int parsePrograms(char * line, char ** programs) {
     return i;
 }
 
-// ja jak będę mieć czas to chciałem telefony poprzeglądać, bo chyba będę nowy kupować
 void execute(char * line) {
     
     char ** programs = calloc(maxNumberOfPrograms, sizeof(char *));
@@ -106,9 +105,9 @@ int main(int argc, char ** argv) {
         return -1;
     }
 
-    char buff[200];
+    char buffor[200];
     char * line;
-    while((line = fgets(buff,sizeof(buff), file)) != NULL) {   
+    while((line = fgets(buffor,sizeof(buffor), file)) != NULL) {   
         printf("\nLine: %s\n", line);  
         execute(line);
     }
