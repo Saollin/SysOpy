@@ -9,7 +9,16 @@
 #include <sys/stat.h>
 
 int main(int argc, char ** argv) {
-    char *consumer[6] = {"./consumer", "fifo", "./tests/result.txt", "20", NULL};
+    if(argc < 2) {
+        fprintf(stderr, "Wrong number of arguments! Give buffored chars");
+        return -1;
+    }
+
+    int numberOfChars = atoi(argv[1]);
+    char * chars = calloc(2, sizeof(char));
+    sprintf(chars, "%d", numberOfChars + 10);
+
+    char *consumer[6] = {"./consumer", "fifo", "./tests/result.txt", chars, NULL};
 
     char ***producer = calloc(5, sizeof(char **));
     for(int i = 0; i < 5; i++) {
@@ -19,7 +28,7 @@ int main(int argc, char ** argv) {
         producer[i][0] ="./producer";
         producer[i][1] = "fifo"; 
         producer[i][2] = fileName;
-        producer[i][3] =  "3";
+        producer[i][3] =  argv[1];
         producer[i][4] = NULL;
     }
     
@@ -28,7 +37,8 @@ int main(int argc, char ** argv) {
 
     pid_t pids[6];
 
-    for(int i = 0; i < 5; i++) {
+
+   for(int i = 0; i < 5; i++) {
         if((pids[i] = fork()) == 0) {
             execvp(producer[i][0], producer[i]);
         }
