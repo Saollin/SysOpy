@@ -1,6 +1,6 @@
 CC = gcc
 FLAGS = -Wall -ggdb
-RAPORT_FILE = raport2.txt
+RAPORT_FILE = raport.txt
 
 all: compile
 	make test > $(RAPORT_FILE)

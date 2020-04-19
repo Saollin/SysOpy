@@ -1,6 +1,6 @@
 CC = gcc
 FLAGS = -Wall -ggdb
-RAPORT_FILE = raport3.txt
+RAPORT_FILE = raport.txt
 
 compile: clean
 	$(CC) $(FLAGS) -o main main.c
