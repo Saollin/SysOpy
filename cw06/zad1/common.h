@@ -1,11 +1,11 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define MESSAGE_LEN 256
+#define MESSAGE_LENGTH 256
 
 typedef struct {
     long type;
-    char text[MESSAGE_LEN];
+    char text[MESSAGE_LENGTH];
 } msgbuf;
 
 #define STOP 1L
@@ -14,7 +14,7 @@ typedef struct {
 #define INIT 4L
 #define CONNECT 5L
 
-#define MAX_CLIENTS 64
+#define MAX_NUMBER_CLIENTS 64
 #define SERVER_ID 1111
 
 #define NO_MESSAGES 42
