@@ -33,6 +33,36 @@ msgbuf * getMsg(int queue) {
     return tmp;
 }
 
+void initHandler(msgbuf * message) {
+    for (int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
+        if(userQueues[i] == 0) {
+            userQueues[i] = msgget(atoi(message->text), IPC_CREAT | 0777);
+            char buf[50];
+            sprintf(buf, "%d", i);
+            sendMsg(userQueues[i], buf, INIT);
+            break;
+        }
+    }
+}
+
+void listHandler(msgbuf * message) {
+    int clientID = atoi(message->text);
+    char * msg = callock(1000, sizeof(char));
+    char * clientLine = callock(100, sizeof(char));
+    for(int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
+        if(userQueues[i] != 0) {
+            if(i != clientID && chats[i] != 1) {
+                sprintf(clientLine, "%d: 1\n", i);
+            }
+            else {
+                sprintf(clientLine, "%d: 0\n", i);
+            }
+            strcat(msg, clientLine);
+        }
+    }
+    sendMsg(userQueues[clientID], msg, LIST);
+}
+
 void siginthandler(int signal) {
     char job[5];
     strcpy(job, "job");
@@ -70,19 +100,19 @@ int main(int argc, char ** argv) {
             printf("Message: %s", message->text);
             switch(message->type) {
                 case INIT:
-                    initHandler();
+                    initHandler(message);
                     break;
                 case LIST:
-                    listHandler();
+                    listHandler(message);
                     break;
                 case CONNECT:
-                    connectHandler();
+                    connectHandler(message);
                     break;
                 case DISCONNECT:
-                    disconnectHandler();
+                    disconnectHandler(message);
                     break;
                 case STOP:
-                    stopHandler();
+                    stopHandler(message);
                     break;
                 default:
                     printf("Error");
