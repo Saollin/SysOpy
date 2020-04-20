@@ -11,11 +11,12 @@
 #include <unistd.h>
 #include <time.h>
 #include <errno.h>
+#include <stdbool.h> 
 
 #include "common.h"
 
 int userQueues[MAX_NUMBER_CLIENTS];
-int chats[MAX_NUMBER_CLIENTS];
+bool chats[MAX_NUMBER_CLIENTS];
 
 int serverQueue;
 
@@ -51,16 +52,49 @@ void listHandler(msgbuf * message) {
     char * clientLine = callock(100, sizeof(char));
     for(int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
         if(userQueues[i] != 0) {
-            if(i != clientID && chats[i] != 1) {
-                sprintf(clientLine, "%d: 1\n", i);
+            if(i != clientID && chats[i]) {
+                sprintf(clientLine, "Client %d: not available\n", i);
             }
             else {
-                sprintf(clientLine, "%d: 0\n", i);
+                sprintf(clientLine, "Client %d: available\n", i);
             }
             strcat(msg, clientLine);
         }
     }
     sendMsg(userQueues[clientID], msg, LIST);
+}
+
+void connectHandler(msgbuf * message) {
+    int firstClient = atoi(strtok(message->text, " "));
+    int secondClient = atoi(strtok(NULL, " "));
+    char * msg = callock(200, sizeof(char));
+    if(firstClient != secondClient && userQueues[secondClient] && !chats[secondClient]) {
+        printf("Chat has started.\n");
+
+        //message to first client with second client queue
+        sprintf(msg, "%d", userQueues[secondClient]);
+        sendMsg(userQueues[firstClient], msg, CONNECT);
+
+        //message to second client with first client queue
+        sprintf(msg, "%d", userQueues[firstClient]);
+        sendMsg(userQueues[secondClient], msg, CONNECT);
+
+        //set chats
+        chats[firstClient] = chats[secondClient] = true;
+    }   
+}
+
+void disconnectHandler(msgbuf * message) {
+    int clientID = atoi(message->text);
+    printf("User with %d ID has disconnected.", clientID);
+    chats[clientID] = false;
+}
+
+void stopHandler(msgbuf * message) {
+    int clientID = atoi(message->text);
+    printf("User with %d ID has logged out\n", clientID);
+    userQueues[clientID] = 0;
+    chats[clientID] = 0;
 }
 
 void siginthandler(int signal) {
@@ -75,13 +109,16 @@ void siginthandler(int signal) {
     exit(0);
 }
 
+void connectHandler(msgbuf * message) {
+    
+}
 
 int main(int argc, char ** argv) {
     
     //cleaning userQueues and chats
     for(int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
         userQueues[i] = 0;
-        chats[i] = 0;
+        chats[i] = false;
     }
 
     char * home = getpwuid(getuid())->pw_dir;
