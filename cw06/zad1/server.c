@@ -20,31 +20,6 @@ bool chats[MAX_NUMBER_CLIENTS];
 
 int serverQueue;
 
-char * intToString(int i) {
-    char * str = calloc(200, sizeof(char));
-    sprintf(str, "%d", i);
-    return str;
-}
-
-void sendMsg(int queue, char * msg, long type) {
-    msgbuf message;
-    message.type = type;
-    strcpy(message.text, msg);
-    msgsnd(queue, &message, sizeof(message.text), 0);
-}
-
-msgbuf * getMsg(int queue) {
-    msgbuf * tmp = calloc(1, sizeof(msgbuf));
-    msgrcv(queue, tmp, sizeof(tmp->text), 0, MSG_NOERROR);
-    return tmp;
-}
-
-msgbuf * getMsgOfType(int queue, long type) {
-    msgbuf * tmp = calloc(1, sizeof(msgbuf));
-    msgrcv(queue, tmp, sizeof(tmp->text), type, MSG_NOERROR);
-    return tmp;
-}
-
 void initHandler(msgbuf * message) {
     for (int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
         if(userQueues[i] == 0) {
@@ -72,8 +47,7 @@ void listHandler(msgbuf * message) {
         }
     }
     sendMsg(userQueues[clientID], msg, LIST);
-    printf("List of clienTs was send to %d\n", clientID);
-    printf("%s\n", msg);
+    printf("List of clients was send to %d\n", clientID);
 }
 
 void connectHandler(msgbuf * message) {

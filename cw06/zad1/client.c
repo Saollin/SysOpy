@@ -22,32 +22,6 @@ int chat = -1;
 int myQueue;
 int idOnServer = -1;
 
-char * intToString(int i) {
-    char * str = calloc(200, sizeof(char));
-    sprintf(str, "%d", i);
-    return str;
-}
-
-void sendMsg(int queue, char * msg, long type) {
-    msgbuf message;
-    message.type = type;
-    strcpy(message.text, msg);
-    msgsnd(queue, &message, sizeof(message.text), 0);
-}
-
-
-msgbuf * getMsg(int queue) {
-    msgbuf * tmp = calloc(1, sizeof(msgbuf));
-    msgrcv(queue, tmp, sizeof(tmp->text), 0, MSG_NOERROR);
-    return tmp;
-}
-
-msgbuf * getMsgOfType(int queue, long type) {
-    msgbuf * tmp = calloc(1, sizeof(msgbuf));
-    msgrcv(queue, tmp, sizeof(tmp->text), type, MSG_NOERROR);
-    return tmp;
-}
-
 void stopClient() {
     sendMsg(serverQueue, intToString(idOnServer), STOP);
     if(chat != -1) {
