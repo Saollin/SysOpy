@@ -72,7 +72,7 @@ void listHandler(msgbuf * message) {
         }
     }
     sendMsg(userQueues[clientID], msg, LIST);
-    printf("List of clietns was send to %d\n", clientID);
+    printf("List of clienTs was send to %d\n", clientID);
     printf("%s\n", msg);
 }
 
@@ -107,21 +107,15 @@ void stopHandler(msgbuf * message) {
 }
 
 void siginthandler(int signal) {
-    char job[20];
-    strcpy(job, "stop server");
     int usersCounter = 0;
     for(int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
         if(userQueues[i] != 0) {
-            sendMsg(userQueues[i], job, STOP);
+            sendMsg(userQueues[i], "", STOP);
             usersCounter++;
             msgbuf * msg = getMsgOfType(serverQueue, STOP);
             stopHandler(msg);
         }
     }
-    // while(usersCounter > 0) {
-        
-    //     usersCounter--;
-    // }
     printf("\nDeleting server queue.\n");
     msgctl(serverQueue, IPC_RMID, NULL);
     exit(0);
