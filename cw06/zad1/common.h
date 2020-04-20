@@ -13,6 +13,7 @@ typedef struct {
 #define LIST 3L
 #define INIT 4L
 #define CONNECT 5L
+#define CHAT 6L
 
 #define MAX_NUMBER_CLIENTS 64
 #define SERVER_ID 1111

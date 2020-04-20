@@ -78,10 +78,7 @@ void listHandler(msgbuf * message) {
 
 void connectHandler(msgbuf * message) {
     int firstClient = atoi(strtok(message->text, " "));
-    printf("First client: %d ", firstClient);
     int secondClient = atoi(strtok(NULL, " "));
-    printf("Second client: %d\n", secondClient);
-    printf("%d\n", userQueues[secondClient]);
     if(firstClient != secondClient && userQueues[secondClient] != 0 && !chats[secondClient]) {
         printf("Chat has started.\n");
 
@@ -90,7 +87,6 @@ void connectHandler(msgbuf * message) {
 
         //message to second client with first client queue
         sendMsg(userQueues[secondClient], intToString(userQueues[firstClient]), CONNECT);
-        printf("here\n");
         //set chats
         chats[firstClient] = true; 
         chats[secondClient] = true;
@@ -118,13 +114,14 @@ void siginthandler(int signal) {
         if(userQueues[i] != 0) {
             sendMsg(userQueues[i], job, STOP);
             usersCounter++;
+            msgbuf * msg = getMsgOfType(serverQueue, STOP);
+            stopHandler(msg);
         }
     }
-    while(usersCounter > 0) {
-        msgbuf * msg = getMsgOfType(serverQueue, STOP);
-        stopHandler(msg);
-        usersCounter--;
-    }
+    // while(usersCounter > 0) {
+        
+    //     usersCounter--;
+    // }
     printf("\nDeleting server queue.\n");
     msgctl(serverQueue, IPC_RMID, NULL);
     exit(0);

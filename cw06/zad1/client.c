@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 199309L
 #include <sys/types.h>
 #include <sys/msg.h>
 #include <sys/ipc.h>
@@ -12,6 +13,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <pwd.h>
+#include <time.h>
 
 #include "common.h"
 
@@ -46,42 +48,6 @@ msgbuf * getMsgOfType(int queue, long type) {
     return tmp;
 }
 
-
-void startChat() {
-    printf("Start with %d has started.\nWrite \\end to end it.\n", chat);
-    
-    struct msqid_ds info;
-    int messagesNumber;
-    char line[100];
-    bool isChatRunning = true;
-    do {
-        msgctl(myQueue,IPC_STAT, &info);
-        messagesNumber = info.msg_qnum;
-        while(messagesNumber > 0) {
-            msgbuf * msg = getMsg(myQueue);
-            if(msg->type == DISCONNECT) {
-                sendMsg(serverQueue, intToString(idOnServer), DISCONNECT);
-                isChatRunning = false;
-                break;
-            }
-            printf("%s \n", msg->text);
-            msgctl(myQueue, IPC_STAT, &info);
-            messagesNumber = info.msg_qnum;
-        }
-        if(isChatRunning) {
-            fgets(line, sizeof(line), stdin);
-            if(!strcmp(line, "\\end")) {
-                sendMsg(serverQueue, intToString(idOnServer), DISCONNECT);
-                sendMsg(chat, line, DISCONNECT);
-                isChatRunning = false;
-            }
-            else {
-                sendMsg(chat, line, CONNECT);
-            }
-        }
-    } while (isChatRunning);
-}
-
 void stopClient() {
     sendMsg(serverQueue, intToString(idOnServer), STOP);
     if(chat != -1) {
@@ -96,6 +62,47 @@ void sigintHandler(int signal) {
     stopClient();
 }
 
+void getAnswers(union sigval sv) {
+    (void)sv;
+    msgbuf answer;
+    while (msgrcv(myQueue, &answer, MESSAGE_LENGTH, 0, IPC_NOWAIT) != -1) {
+        switch (answer.type) {
+            case STOP:
+                printf("Serves was closed");
+                stopClient();
+                break;
+            case CONNECT:
+                chat = atoi(answer.text);
+                printf("Chat with %d has started.\n", chat);
+                break;
+            case DISCONNECT:
+                sendMsg(serverQueue, intToString(idOnServer), DISCONNECT);
+                printf("Chat with %d has finished\n", chat);
+                chat = -1;
+                break;
+            case CHAT:
+                printf("-> %s", answer.text);
+                break;
+            case LIST:
+                printf("List of clients: \n");
+                printf("%s\n", answer.text);
+                break;
+        }
+    }
+}
+
+void messageListener() {
+    timer_t timer;
+    struct sigevent event;
+    event.sigev_notify = SIGEV_THREAD;
+    event.sigev_notify_function = getAnswers;
+    event.sigev_notify_attributes = NULL;
+    event.sigev_value.sival_ptr = NULL;
+    timer_create(CLOCK_REALTIME, &event, &timer);
+    struct timespec ten_ms = {0, 10000000};
+    struct itimerspec timer_value = {ten_ms, ten_ms};
+    timer_settime(timer, 0, &timer_value, NULL);
+}
 
 int main(int argc, char ** argv) {
     char *home = getpwuid(getuid())->pw_dir;
@@ -116,7 +123,9 @@ int main(int argc, char ** argv) {
     printf("My queue ID: %d\n", myQueue);
     printf("My id on server: %d\n", idOnServer);
 
-    struct msqid_ds info;
+    messageListener();
+
+    // struct msqid_ds info;
     char inputLine[100];
     while(true) {
 
@@ -133,34 +142,19 @@ int main(int argc, char ** argv) {
         }
         else if (!strncmp(inputLine, "DISCONNECT", strlen("DISCONNECT"))) {
             sendMsg(serverQueue, intToString(idOnServer), DISCONNECT);
+            printf("Chat with %d has finished\n", chat);
+            sendMsg(chat, intToString(idOnServer), DISCONNECT);
+            chat = -1;
         }
         else if (!strncmp(inputLine, "STOP", strlen("STOP"))) {
             stopClient();
         }
-    
+        else if (chat != -1) {
+            sendMsg(chat, inputLine, CHAT);
+        }
         sleep(1);
 
-        //receiving messages
-        msgctl(myQueue, IPC_STAT, &info);
-        int messagesNumber = info.msg_qnum;
-        while(messagesNumber > 0) {
-            msgbuf * answer = getMsg(myQueue);
-            
-            if(answer->type == STOP) {
-                printf("Serves was closed");
-                stopClient();
-            }
-            else if(answer->type == CONNECT) {
-                chat = atoi(answer->text);
-                startChat();
-            }
-            else if(answer->type == LIST) {
-                printf("List of clients: \n");
-                printf("%s\n", answer->text);
-            }   
-            msgctl(myQueue, IPC_STAT, &info);
-            messagesNumber = info.msg_qnum;
-        }
+        
     }
     stopClient();
 }
