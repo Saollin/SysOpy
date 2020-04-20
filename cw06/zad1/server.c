@@ -20,6 +20,12 @@ bool chats[MAX_NUMBER_CLIENTS];
 
 int serverQueue;
 
+char * intToString(int i) {
+    char * str = callock(200, sizeof(char));
+    sprintf(str, "%d", i);
+    return str;
+}
+
 void sendMsg(int queue, char * msg, long type) {
     msgbuf message;
     message.type = type;
@@ -29,8 +35,13 @@ void sendMsg(int queue, char * msg, long type) {
 
 msgbuf * getMsg(int queue) {
     msgbuf * tmp = calloc(1, sizeof(msgbuf));
-    tmp->type = 1;
     msgrcv(queue, tmp, sizeof(tmp->text), 0, MSG_NOERROR);
+    return tmp;
+}
+
+msgbuf * getMsgOfType(int queue, long type) {
+    msgbuf * tmp = calloc(1, sizeof(msgbuf));
+    msgrcv(queue, tmp, sizeof(tmp->text), type, MSG_NOERROR);
     return tmp;
 }
 
@@ -38,9 +49,7 @@ void initHandler(msgbuf * message) {
     for (int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
         if(userQueues[i] == 0) {
             userQueues[i] = msgget(atoi(message->text), IPC_CREAT | 0777);
-            char buf[50];
-            sprintf(buf, "%d", i);
-            sendMsg(userQueues[i], buf, INIT);
+            sendMsg(userQueues[i], intToString(i), INIT);
             break;
         }
     }
@@ -48,7 +57,7 @@ void initHandler(msgbuf * message) {
 
 void listHandler(msgbuf * message) {
     int clientID = atoi(message->text);
-    char * msg = callock(1000, sizeof(char));
+    char * msg = callock(MESSAGE_LENGTH, sizeof(char));
     char * clientLine = callock(100, sizeof(char));
     for(int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
         if(userQueues[i] != 0) {
@@ -67,17 +76,14 @@ void listHandler(msgbuf * message) {
 void connectHandler(msgbuf * message) {
     int firstClient = atoi(strtok(message->text, " "));
     int secondClient = atoi(strtok(NULL, " "));
-    char * msg = callock(200, sizeof(char));
     if(firstClient != secondClient && userQueues[secondClient] && !chats[secondClient]) {
         printf("Chat has started.\n");
 
         //message to first client with second client queue
-        sprintf(msg, "%d", userQueues[secondClient]);
-        sendMsg(userQueues[firstClient], msg, CONNECT);
+        sendMsg(userQueues[firstClient], intToString(userQueues[secondClient]), CONNECT);
 
         //message to second client with first client queue
-        sprintf(msg, "%d", userQueues[firstClient]);
-        sendMsg(userQueues[secondClient], msg, CONNECT);
+        sendMsg(userQueues[secondClient], intToString(userQueues[firstClient]), CONNECT);
 
         //set chats
         chats[firstClient] = chats[secondClient] = true;
@@ -94,23 +100,27 @@ void stopHandler(msgbuf * message) {
     int clientID = atoi(message->text);
     printf("User with %d ID has logged out\n", clientID);
     userQueues[clientID] = 0;
-    chats[clientID] = 0;
+    chats[clientID] = false;
 }
 
 void siginthandler(int signal) {
-    char job[5];
-    strcpy(job, "job");
+    char job[20];
+    strcpy(job, "stop server");
+    int usersCounter = 0;
     for(int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
         if(userQueues[i] != 0) {
-            sendMsg(userQueues[i], job, DISCONNECT);
+            sendMsg(userQueues[i], job, STOP);
+            usersCounter++;
         }
     }
+    while(usersCounter > 0) {
+        msgbuf * msg = getMsgOfType(serverQueue, STOP);
+        stopHandler(msg);
+        usersCounter--;
+    }
+    printf("Deleting server queue.\n");
     msgctl(serverQueue, IPC_RMID, NULL);
     exit(0);
-}
-
-void connectHandler(msgbuf * message) {
-    
 }
 
 int main(int argc, char ** argv) {
