@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define MESSAGE_LENGTH 256
+#define MESSAGE_LENGTH 1000
 
 typedef struct {
     long type;

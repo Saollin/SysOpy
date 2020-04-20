@@ -21,7 +21,7 @@ int myQueue;
 int idOnServer = -1;
 
 char * intToString(int i) {
-    char * str = callock(200, sizeof(char));
+    char * str = calloc(200, sizeof(char));
     sprintf(str, "%d", i);
     return str;
 }
@@ -46,15 +46,6 @@ msgbuf * getMsgOfType(int queue, long type) {
     return tmp;
 }
 
-void stopClient() {
-    sendMsg(serverQueue, intToString(idOnServer), STOP);
-    if(chat != -1) {
-        sendMsg(chat, intToString(idOnServer), DISCONNECT);
-    }
-    printf("Queue will be deleted.");
-    msgctl(myQueue, IPC_RMID, NULL);
-    exit(0);
-}
 
 void startChat() {
     printf("Start with %d has started.\nWrite \\end to end it.\n", chat);
@@ -91,6 +82,16 @@ void startChat() {
     } while (isChatRunning);
 }
 
+void stopClient() {
+    sendMsg(serverQueue, intToString(idOnServer), STOP);
+    if(chat != -1) {
+        sendMsg(chat, intToString(idOnServer), DISCONNECT);
+    }
+    printf("\nQueue will be deleted.\n");
+    msgctl(myQueue, IPC_RMID, NULL);
+    exit(0);
+}
+
 void sigintHandler(int signal) {
     stopClient();
 }
@@ -100,7 +101,7 @@ int main(int argc, char ** argv) {
     char *home = getpwuid(getuid())->pw_dir;
     
     key_t serverKey = ftok(home, SERVER_ID);
-    serverQueue = msgget(serverKey, 0666);
+    serverQueue = msgget(serverKey, 0777);
 
     key_t clientKey = ftok(home, getpid());
     myQueue = msgget(clientKey, IPC_CREAT | 0777);
@@ -109,20 +110,24 @@ int main(int argc, char ** argv) {
 
     sendMsg(serverQueue, intToString(myQueue), INIT);
 
-    idOnServer = atoi(getMsgOfType(myQueue, INIT));
-
-    printf("My id on server: %d", idOnServer);
+    idOnServer = atoi(getMsgOfType(myQueue, INIT)->text);
+    // printf("here\n");
+    
+    printf("My queue ID: %d\n", myQueue);
+    printf("My id on server: %d\n", idOnServer);
 
     struct msqid_ds info;
     char inputLine[100];
-    while(fgets(inputLine, sizeof(inputLine), stdin)) {
+    while(true) {
+
+        fgets(inputLine, sizeof(inputLine), stdin);
         if(!strncmp(inputLine, "LIST", strlen("LIST"))) { //starts with
             sendMsg(serverQueue, intToString(idOnServer), LIST);
         }
         else if (!strncmp(inputLine, "CONNECT", strlen("CONNECT"))) {
             (void)strtok(inputLine, " ");
             int secondClient = atoi(strtok(NULL, " "));
-            char * msg[MESSAGE_LENGTH];
+            char msg[MESSAGE_LENGTH];
             sprintf(msg, "%d %d", idOnServer, secondClient);
             sendMsg(serverQueue, msg, CONNECT);
         }
@@ -136,12 +141,10 @@ int main(int argc, char ** argv) {
         sleep(1);
 
         //receiving messages
-        msgctl(serverQueue, IPC_STAT, &info);
+        msgctl(myQueue, IPC_STAT, &info);
         int messagesNumber = info.msg_qnum;
         while(messagesNumber > 0) {
             msgbuf * answer = getMsg(myQueue);
-            msgctl(serverQueue, IPC_STAT, &info);
-            messagesNumber = info.msg_qnum;
             
             if(answer->type == STOP) {
                 printf("Serves was closed");
@@ -155,6 +158,8 @@ int main(int argc, char ** argv) {
                 printf("List of clients: \n");
                 printf("%s\n", answer->text);
             }   
+            msgctl(myQueue, IPC_STAT, &info);
+            messagesNumber = info.msg_qnum;
         }
     }
     stopClient();
