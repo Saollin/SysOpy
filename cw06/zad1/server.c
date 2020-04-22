@@ -37,7 +37,8 @@ void listHandler(msgbuf * message) {
     char * clientLine = calloc(100, sizeof(char));
     for(int i = 0; i < MAX_NUMBER_CLIENTS; i++) {
         if(userQueues[i] != 0) {
-            if(i != clientID && chats[i]) {
+            if (i == clientID) continue;
+            if(chats[i]) {
                 sprintf(clientLine, "Client %d: not available\n", i);
             }
             else {
