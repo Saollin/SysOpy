@@ -23,12 +23,3 @@ int countPACK(order * orders) {
         }
     return counter;
 }
-
-void wait(int semaphoresID, int id) {
-    struct sembuf *tmp = calloc(1, sizeof(struct sembuf));
-
-    tmp->sem_num = id;
-    tmp->sem_op = 0;
-    
-    semop(semaphoresID, tmp, 1);
-}

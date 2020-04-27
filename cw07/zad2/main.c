@@ -1,59 +1,76 @@
 #include "operations.h"
 #include <signal.h>
+#include <errno.h>
 
-key_t shMemoryKey;
+#define debug true
+
+char * shMemoryName;
 int shMemoryID;
+int shMemorySize = MAX_ORDERS + 1;
+order * orders;
 
-key_t semaphoresKey;
-int semaphoresID;
+char ** semaphoresNames;
+sem_t ** semaphoresIDs;
 
 int workers = MAKERS + PACKERS + SENDERS;
-int shMemorySize = MAX_ORDERS + 1;
 
-order * orders;
+int error(char * message) {
+    if (errno) {
+        perror(message);
+        return 1;
+    }
+    return 0;
+}
+
+void deleteSemaphores() {
+    for(int i = 0; i < workers; i++) {
+        sem_close(semaphoresIDs[i]);
+        sem_unlink(semaphoresNames[i]);
+    }
+}
 
 void sigintHandler(int signal) {
     kill(0, SIGINT);
 
-    deleteSemaphores(semaphoresID);
-    closeShMemory(orders);
-    deleteShMemory(shMemoryID);
+    deleteSemaphores();
+    closeShMemory(orders, shMemorySize);
+    deleteShMemory(shMemoryName);
     exit(0);
 }
 
-order * createShMemory(size_t size) {
-    shMemoryKey = ftok(getenv("HOME"), rand() % 256);
-    shMemoryID = shmget(shMemoryKey, size * sizeof(order), IPC_CREAT | 0666);
-    return shmat(shMemoryID, NULL, 0);
+void createShMemory(size_t size) {
+    shMemoryName = calloc(16, sizeof(char));
+    sprintf(shMemoryName, "//shMemory");
+    shMemoryID = shm_open(shMemoryName, O_CREAT | O_RDWR, S_IRWXU);
+    if(error("Creating share memory")) {
+        exit(0);
+    }
+    printf("id %d\n", shMemoryID);
+    printf("trunc: %d\n", ftruncate(shMemoryID, size * sizeof(order)));
+    orders = mmap(NULL, size * sizeof(order), PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED, shMemoryID, 0);
 }
 
-void createSemaphores(int semaphoresSize) {
-    semaphoresKey = ftok(getenv("HOME"), rand() % 256);
-    semaphoresID = semget(semaphoresKey, semaphoresSize, IPC_CREAT | 0666);
-    
-    union semun arg;
-    arg.val = 0;
-
-    for (int i = 0; i < semaphoresSize; ++i) {
-        semctl(semaphoresID, i, SETVAL, arg);
+void createSemaphores(int semaphoresNumber) {
+    semaphoresNames = calloc(semaphoresNumber, sizeof(char *));
+    semaphoresIDs = calloc(semaphoresNumber, sizeof(sem_t *));
+    for(int i = 0; i < semaphoresNumber; i++) {
+        semaphoresNames[i] = calloc(16, sizeof(char));
+        sprintf(semaphoresNames[i], "/semaphore%d", i);
+        semaphoresIDs[i] = sem_open(semaphoresNames[i], O_RDWR | O_CREAT, 0, 0);
+        if(error("Creating semaphores")) {
+            exit(0);
+        }
     }
-
-    struct sembuf * bufs = calloc(semaphoresSize, sizeof(struct sembuf));
-    for (int i = 0; i < semaphoresSize; i++) {
-        bufs[i].sem_num = i;
-        bufs[i].sem_op = 1;
-    }
-    semop(semaphoresID, bufs, semaphoresSize);
 }
+
 
 int * createWorkers() {
     char ** arguments = calloc(5, sizeof(char *));
-    for(int i = 0; i < 5; i++){
+    for(int i = 0; i < 4; i++){
         arguments[i] = calloc(16, sizeof(char));
     }
-    sprintf(arguments[1], "%d", shMemoryKey);
-    sprintf(arguments[2], "%d", semaphoresKey);
-    arguments[4] = NULL;
+    sprintf(arguments[1], "%s", shMemoryName);
+    arguments[3] = NULL;
 
     int semID = 0;
     //makers
@@ -61,7 +78,7 @@ int * createWorkers() {
     for(int i = 0; i < MAKERS; i++) {
         makers[i] = semID;
         sprintf(arguments[0], "maker");
-        sprintf(arguments[3], "%d", semID++);
+        sprintf(arguments[2], "%s", semaphoresNames[semID++]);
         if(fork() == 0) {
             execv("maker", arguments);
         }
@@ -70,7 +87,7 @@ int * createWorkers() {
     //packers
     for(int i = 0; i < PACKERS; i++) {
         sprintf(arguments[0], "packer");
-        sprintf(arguments[3], "%d", semID++);
+        sprintf(arguments[2], "%s", semaphoresNames[semID++]);
         if(fork() == 0) {
             execv("packer", arguments);
         }
@@ -79,7 +96,7 @@ int * createWorkers() {
     //senders
     for(int i = 0; i < SENDERS; i++) {
         sprintf(arguments[0], "sender");
-        sprintf(arguments[3], "%d", semID++);
+        sprintf(arguments[2], "%s", semaphoresNames[semID++]);
         if(fork() == 0) {
             execv("sender", arguments);
         }
@@ -100,29 +117,44 @@ int main() {
 
     srand(time(NULL));
 
-    orders = createShMemory(shMemorySize);
+    createShMemory(shMemorySize);
     createSemaphores(workers);
 
     orders[0].size = 1;
     orders[0].status = -1;
 
-    printf("Key of shared memory: %d\n Key to set of semaphores: %d\n", shMemoryKey, semaphoresKey);
+    printf("Key of shared memory: %s\n", shMemoryName); 
 
     int * makers = createWorkers();
 
     int workerID = 0;
     while (true) {
+        if (debug) {
+            printf("{ ");
+            for (int i = 0; i < shMemorySize; ++i) {
+                printf("[%d (%d)] ", orders[i].size, orders[i].status);
+            }
+            printf("\n");
+            printf("\n");
+        }
+
         if (orders[orders[0].size].status == 0) {
             workerID++;
             workerID %= workers;
-            semaphoreDecrease(semaphoresID, workerID);
+            sem_t * workerSemaphore = semaphoresIDs[workerID];
+            if (getValueFromSemaphore(workerSemaphore) == 0) {
+                sem_post(workerSemaphore);
+            }
         }
         else {
             do {
                 workerID++;
                 workerID %= workers;
             } while (isIn(makers, MAKERS, workerID));
-            semaphoreDecrease(semaphoresID, workerID);
+            sem_t * workerSemaphore = semaphoresIDs[workerID];
+            if (getValueFromSemaphore(workerSemaphore) == 0) {
+                sem_post(workerSemaphore);
+            }
         }
         sleep(1);
     }

@@ -1,44 +1,31 @@
 #include "operations.h"
 #include <errno.h>
 
-order * openShMemory(int shMemoryId) {
-    order * orders = shmat(shMemoryId, NULL, 0);
+order * openShMemory(char * name, int size) {
+    int id = shm_open(name, O_RDWR, 0);
+    order * orders = mmap(NULL, size * sizeof(order), PROT_READ | PROT_EXEC | PROT_WRITE, MAP_SHARED, id, 0);
     return orders;
 }
 
-int closeShMemory(order * orders) {
-    return shmdt(orders);
+int closeShMemory(order * orders, int size) {
+    return munmap(orders, size);
 }
 
-int deleteShMemory(int shMemoryId) {
-    return shmctl(shMemoryId, IPC_RMID, NULL);
+int deleteShMemory(char * name) {
+    return shm_unlink(name);
 }
 
-void semaphoreExecute(int setId, int index, int operation, short flag) {
-    struct sembuf * buf = calloc(1, sizeof(struct sembuf));
-    buf->sem_op = operation;
-    buf->sem_num = index;
-    buf->sem_flg = flag;
-    semop(setId, buf, 1);
+int getValueFromSemaphore(sem_t * semId) {
+    int value;
+    sem_getvalue(semId, &value);
+    return value;
 }
 
-void semaphoreIncrease(int setId, int index) {
-    semaphoreExecute(setId, index, 1, 0);
+void closeSemaphore(sem_t * semId) {
+    sem_close(semId);
 }
 
-void semaphoreDecrease(int setId, int index) {
-    semaphoreExecute(setId, index, -1, 0);
-}
-
-void waitForSemaphore(int setId, int index) {
-    semaphoreExecute(setId, index, 0, 0);
-}
-
-int getValueFromSemaphore(int setId, int index) {
-    return semctl(setId, index, GETVAL);
-}
-
-void deleteSemaphores(int setId) {
-    semctl(setId, 0, IPC_RMID);
+void deleteSemaphore(char * name) {
+    sem_unlink(name);
 }
 

@@ -1,13 +1,17 @@
 #include "worker_common.h"
 #include <signal.h>
 
+char * shMemoryName;
 order * orders;
+
+char * mySemaphoreName;
+sem_t * mySemaphoreID;
 
 int workers = MAKERS + PACKERS + SENDERS;
 int shMemorySize = MAX_ORDERS + 1;
 
 void sigintHandler(int signal) {
-    closeShMemory(orders);
+    closeShMemory(orders, shMemorySize);
     exit(0);
 }
 
@@ -16,13 +20,14 @@ int main(int argc, char ** argv) {
 
     srand(time(NULL));
     
-    int shMemoryID = shmget(atoi(argv[1]), 0, 0666);
-    orders = openShMemory(shMemoryID);
-    int semaphoresID = semget(atoi(argv[2]), 0, 0666);
-    int mySemaphore = atoi(argv[3]);
+    shMemoryName = argv[1];
+    orders = openShMemory(shMemoryName, shMemorySize);
+
+    mySemaphoreName = argv[2];
+    mySemaphoreID = sem_open(mySemaphoreName, O_RDWR);
 
     while(true) {
-        wait(semaphoresID, mySemaphore);
+        sem_wait(mySemaphoreID);
         int number;
         bool found = false;
         for(int i = 0; i < shMemorySize; i++) {
@@ -41,7 +46,6 @@ int main(int argc, char ** argv) {
             int packNumber = countPACK(orders);
             printf("(%d %ld) Wysłałem zamówienie o wielkości: %d. Liczba zamówień do przygotowania: %d. Liczba zamówień do wysłania: %d\n", pid, now(), number, makeNumber, packNumber);
         }
-        semaphoreIncrease(semaphoresID, mySemaphore);
     }
 
 

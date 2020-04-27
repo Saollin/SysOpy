@@ -11,9 +11,14 @@
 #include <sys/shm.h>
 #include <sys/ipc.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/sem.h>
-#include <stdbool.h>
+#include <sys/mman.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <semaphore.h>
+
+#include <stdbool.h>
 
 #define MAX_ORDERS 8
 
@@ -38,16 +43,13 @@ union semun {
     struct seminfo  *__buf;  // Buffer for IPC_INFO
 };
 
-order * openShMemory(int id);
-int closeShMemory(order * orders);
-int deleteShMemory(int semId);
+order * openShMemory(char * name, int size);
+int closeShMemory(order * orders, int size);
+int deleteShMemory(char * name);
 
-void semaphoreExecute(int semId, int index, int operation, short flag);
-void semaphoreIncrease(int setId, int index);
-void semaphoreDecrease(int setId, int index);
-void waitForSemaphore(int setId, int index);
-int getValueFromSemaphore(int setId, int index);
-void deleteSemaphores(int setId);
+int getValueFromSemaphore(sem_t * semId);
+void closeSemaphore(sem_t * semId);
+void deleteSemaphore(char * name);
 
 #endif
 
