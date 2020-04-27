@@ -24,8 +24,3 @@ int getValueFromSemaphore(sem_t * semId) {
 void closeSemaphore(sem_t * semId) {
     sem_close(semId);
 }
-
-void deleteSemaphore(char * name) {
-    sem_unlink(name);
-}
-

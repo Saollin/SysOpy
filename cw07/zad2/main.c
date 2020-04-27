@@ -39,8 +39,12 @@ void sigintHandler(int signal) {
 }
 
 void createShMemory(size_t size) {
+    // random name for shared memory (whole new file for all runs of program)
     shMemoryName = calloc(16, sizeof(char));
     sprintf(shMemoryName, "/shMemory");
+    for(int i = 9; i < 15; i++) {
+        shMemoryName[i] = rand() % 15 + 'a';
+    }
     shMemoryID = shm_open(shMemoryName, O_CREAT | O_RDWR, S_IRWXU);
     if(error("Creating share memory")) {
         exit(0);
