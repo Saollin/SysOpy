@@ -30,14 +30,6 @@ void semaphoreDecrease(int setId, int index) {
     semaphoreExecute(setId, index, -1, 0);
 }
 
-void waitForSemaphore(int setId, int index) {
-    semaphoreExecute(setId, index, 0, 0);
-}
-
-int getValueFromSemaphore(int setId, int index) {
-    return semctl(setId, index, GETVAL);
-}
-
 void deleteSemaphores(int setId) {
     semctl(setId, 0, IPC_RMID);
 }

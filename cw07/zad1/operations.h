@@ -45,8 +45,6 @@ int deleteShMemory(int semId);
 void semaphoreExecute(int semId, int index, int operation, short flag);
 void semaphoreIncrease(int setId, int index);
 void semaphoreDecrease(int setId, int index);
-void waitForSemaphore(int setId, int index);
-int getValueFromSemaphore(int setId, int index);
 void deleteSemaphores(int setId);
 
 #endif
