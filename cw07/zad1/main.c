@@ -1,8 +1,6 @@
 #include "operations.h"
 #include <signal.h>
 
-#define debug true
-
 key_t shMemoryKey;
 int shMemoryID;
 
@@ -126,19 +124,7 @@ int main() {
             } while (isIn(makers, MAKERS, workerID));
             semaphoreDecrease(semaphoresID, workerID);
         }
-        if (debug) {
-            printf("{ \n");
-            for (int i = 0; i < shMemorySize; ++i) {
-                printf("%d - [%d (%d)] \n", i, orders[i].size, orders[i].status);
-            }
-            printf("}\n");
-            for (int i = 0; i < workers; ++i) {
-                printf("%d - [%d] ", i, getValueFromSemaphore(semaphoresID, i));
-            }
-            printf("\n\n");
-        }
         sleep(1);
-
     }
 }
 
