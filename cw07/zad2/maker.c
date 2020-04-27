@@ -12,6 +12,7 @@ int shMemorySize = MAX_ORDERS + 1;
 
 void sigintHandler(int signal) {
     closeShMemory(orders, shMemorySize);
+    closeSemaphore(mySemaphoreID);
     exit(0);
 }
 

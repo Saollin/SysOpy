@@ -40,7 +40,7 @@ void sigintHandler(int signal) {
 
 void createShMemory(size_t size) {
     shMemoryName = calloc(16, sizeof(char));
-    sprintf(shMemoryName, "//shMemory");
+    sprintf(shMemoryName, "/shMemory");
     shMemoryID = shm_open(shMemoryName, O_CREAT | O_RDWR, S_IRWXU);
     if(error("Creating share memory")) {
         exit(0);
@@ -56,10 +56,7 @@ void createSemaphores(int semaphoresNumber) {
     for(int i = 0; i < semaphoresNumber; i++) {
         semaphoresNames[i] = calloc(16, sizeof(char));
         sprintf(semaphoresNames[i], "/semaphore%d", i);
-        semaphoresIDs[i] = sem_open(semaphoresNames[i], O_RDWR | O_CREAT, 0, 0);
-        if(error("Creating semaphores")) {
-            exit(0);
-        }
+        semaphoresIDs[i] = sem_open(semaphoresNames[i], O_CREAT | O_CREAT, S_IRUSR|S_IWUSR, 0);
     }
 }
 
@@ -130,9 +127,9 @@ int main() {
     int workerID = 0;
     while (true) {
         if (debug) {
-            printf("{ ");
+            printf("{ \n");
             for (int i = 0; i < shMemorySize; ++i) {
-                printf("[%d (%d)] ", orders[i].size, orders[i].status);
+                printf("[%d (%d)] \n", orders[i].size, orders[i].status);
             }
             printf("\n");
             printf("\n");
