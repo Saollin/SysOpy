@@ -22,23 +22,41 @@ const int pixelsNumber = 256;
 int *result;
 
 void createImageArray(char * imageFile) {
-    FILE * image = fopen(imageFile, "r");
-    char buff[32];
-    fgets(buff, 32, image);
-    int maxVal;
-    fscanf(image, "%d%d%d", &columns, &rows, &maxVal);
+    FILE * image;
+    if((image = fopen(imageFile, "r")) == NULL) {
+        fprintf(stderr, "While opening image file");
+        exit(1);
+    }
+    char line[3000];
+    for(int i = 0; i < 3; i++) {
+        fgets(line, 3000, image);
+    }
+
+    char * value;
+    value = strtok(line, " ");
+    columns = atoi(value);
+    value = strtok(NULL, " ");
+    rows = atoi(value);
 
     imageArray = (int**) calloc(rows, sizeof(int *));
-    for(int i = 0; i < columns; i++) {
+    for(int i = 0; i < rows; i++) {
         imageArray[i] = (int *) calloc(columns, sizeof(int));
     }
-    
-    for (int i = 0; i < rows; ++i) {
-        for (int j = 0; j < columns; ++j) {
-            fscanf(image, "%d", &imageArray[i][j]);
+    fgets(line, sizeof(line), image);
+    int i = 0;
+    int j = 0;
+    while (fgets(line, sizeof(line), image) != NULL) {
+        value = strtok(line, " \n");
+        while (value != NULL) {
+            imageArray[i][j] = atoi(value);
+            j++;
+            value = strtok(NULL, " \n");
+            if(j == columns) {
+                j = 0;
+                i++;
+            }
         }
     }
-
     fclose(image);
 }
 
@@ -55,14 +73,16 @@ void * sign_mode_function() {
     struct timeval startTime, endTime;
     int threadId = getThreadIndex(pthread_self());
     
-    int left = threadId * (pixelsNumber / threadsNumber + 1);
-    int right = left + pixelsNumber / threadsNumber;
-
+    int pixelDown = threadId * (pixelsNumber / threadsNumber);
+    int pixelUp = pixelDown + pixelsNumber / threadsNumber - 1;
     gettimeofday(&startTime, NULL);
     for(int i = 0; i < rows; i++) {
         for(int j = 0; j <= columns; j++) {
-            if(imageArray[i][j] >= left && imageArray[i][j] <= right) {
-                result[imageArray[i][j]]++;
+            int pixelValue = imageArray[i][j];
+            if(pixelValue >= pixelDown && pixelValue <= pixelUp) {
+                semaphoreDecrease(semaphoreID);
+                result[pixelValue]++;
+                semaphoreIncrease(semaphoreID);
             }
         }
     }
@@ -99,7 +119,7 @@ void * interleaved_mode_function() {
     while(i < columns) {
         for(int j = 0; j < rows; j++) {
             semaphoreDecrease(semaphoreID);
-            result[imageArray[i][j]]++;
+            result[imageArray[j][i]]++;
             semaphoreIncrease(semaphoreID);
         }
         i += threadsNumber;
@@ -116,7 +136,6 @@ void saveToFile(char * resultFile) {
     char * buf  = calloc(20, sizeof(char));
     sprintf(buf, "%d %d\n", 2, pixelsNumber);
     fwrite(buf, strlen(buf), 1, rFile);
-    
     int maxNumber = 0;
     for (int i = 0; i < pixelsNumber; i++) {
         if(result[i] > maxNumber) {
@@ -180,7 +199,6 @@ int main(int argc, char ** argv) {
             return -1;
         }
     }
-
     for (int i = 0; i < threadsNumber; i++) {
         int timeValue;
         pthread_join(threadsIDs[i], (void**)&timeValue);
@@ -195,7 +213,6 @@ int main(int argc, char ** argv) {
     printf("Main program - ");
     printTime(timeValue);
     printf("\n\n");
-
     free(imageArray);
     free(threadsIDs);
     free(result);
