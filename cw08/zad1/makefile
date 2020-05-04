@@ -5,7 +5,7 @@ MENSURATION_FILE = Times.txt
 OPTION = sign
 EXTENSION = .ascii.pgm
 
-all: compile tests
+all: clean compile tests
 
 main:
 	# $(CC) $(FLAGS) -o operations -c operations.c
@@ -14,12 +14,13 @@ main:
 compile: main
 
 tests:
-	echo "" > $(MENSURATION_FILE)
+	echo "Sign test" > $(MENSURATION_FILE)
 	make test OPTION=sign
+	echo "Block test" >> $(MENSURATION_FILE)
 	make test OPTION=block
+	echo "Interleaved test" >> $(MENSURATION_FILE)
 	make test OPTION=interleaved 
 	make compare
-	make clean
 
 test:
 	./main 1 $(OPTION) $(IMAGE) 1_thread_$(OPTION)$(EXTENSION) >> $(MENSURATION_FILE)
@@ -27,7 +28,7 @@ test:
 	./main 4 $(OPTION) $(IMAGE) 4_thread_$(OPTION)$(EXTENSION) >> $(MENSURATION_FILE)
 	./main 8 $(OPTION) $(IMAGE) 8_thread_$(OPTION)$(EXTENSION) >> $(MENSURATION_FILE)
 
-# all result files should be the same
+# all result files should be the same - no difference
 compare:
 	./compare.sh
 
