@@ -69,7 +69,7 @@ int getThreadIndex(pthread_t id) {
     return -1;
 }
 
-void * signModeFunction() {
+void * signModeunction() {
     struct timeval startTime, endTime;
     int threadId = getThreadIndex(pthread_self());
     
@@ -89,7 +89,7 @@ void * signModeFunction() {
     pthread_exit((void *) (intptr_t) timeValue);
 }
 
-void * blockModeFunction() {
+void * blockModeunction() {
     struct timeval startTime, endTime;
     int threadId = getThreadIndex(pthread_self());
     
@@ -109,7 +109,7 @@ void * blockModeFunction() {
     pthread_exit((void *) (intptr_t) timeValue);
 }
 
-void * interleavedModeFunction() {
+void * interleavedModeunction() {
     struct timeval startTime, endTime;
     int threadId = getThreadIndex(pthread_self());
     int i = threadId;
@@ -184,13 +184,13 @@ int main(int argc, char ** argv) {
     
     for (int i = 0; i < threadsNumber; i++) {
         if (!strcmp(argv[2],"sign")) {
-            pthread_create(&threadsIDs[i], NULL, signModeFunction, NULL);
+            pthread_create(&threadsIDs[i], NULL, signModeunction, NULL);
         }
         else if (!strcmp(argv[2],"block")) {
-            pthread_create(&threadsIDs[i], NULL, blockModeFunction, NULL);
+            pthread_create(&threadsIDs[i], NULL, blockModeunction, NULL);
         }
         else if (!strcmp(argv[2],"interleaved")) {
-            pthread_create(&threadsIDs[i], NULL, interleavedModeFunction, NULL);
+            pthread_create(&threadsIDs[i], NULL, interleavedModeunction, NULL);
         }
         else {
             fprintf(stderr, "%s is wrong type argument", argv[2]);
