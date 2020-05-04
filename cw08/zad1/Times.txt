@@ -1,0 +1,84 @@
+Sign test
+Thread number 0 - operating time: 0 seconds 0 milliseconds 802 microseconds
+Main program - operating time: 0 seconds 1 milliseconds 152 microseconds
+
+
+Thread number 0 - operating time: 0 seconds 1 milliseconds 685 microseconds
+Thread number 1 - operating time: 0 seconds 1 milliseconds 436 microseconds
+Main program - operating time: 0 seconds 1 milliseconds 957 microseconds
+
+
+Thread number 0 - operating time: 0 seconds 1 milliseconds 100 microseconds
+Thread number 1 - operating time: 0 seconds 1 milliseconds 366 microseconds
+Thread number 2 - operating time: 0 seconds 0 milliseconds 995 microseconds
+Thread number 3 - operating time: 0 seconds 0 milliseconds 616 microseconds
+Main program - operating time: 0 seconds 1 milliseconds 637 microseconds
+
+
+Thread number 0 - operating time: 0 seconds 1 milliseconds 534 microseconds
+Thread number 1 - operating time: 0 seconds 1 milliseconds 614 microseconds
+Thread number 2 - operating time: 0 seconds 1 milliseconds 824 microseconds
+Thread number 3 - operating time: 0 seconds 1 milliseconds 799 microseconds
+Thread number 4 - operating time: 0 seconds 1 milliseconds 664 microseconds
+Thread number 5 - operating time: 0 seconds 1 milliseconds 281 microseconds
+Thread number 6 - operating time: 0 seconds 1 milliseconds 106 microseconds
+Thread number 7 - operating time: 0 seconds 1 milliseconds 56 microseconds
+Main program - operating time: 0 seconds 2 milliseconds 31 microseconds
+
+
+Block test
+Thread number 0 - operating time: 0 seconds 295 milliseconds 788 microseconds
+Main program - operating time: 0 seconds 296 milliseconds 258 microseconds
+
+
+Thread number 0 - operating time: 0 seconds 648 milliseconds 732 microseconds
+Thread number 1 - operating time: 0 seconds 648 milliseconds 788 microseconds
+Main program - operating time: 0 seconds 649 milliseconds 148 microseconds
+
+
+Thread number 0 - operating time: 0 seconds 742 milliseconds 110 microseconds
+Thread number 1 - operating time: 0 seconds 742 milliseconds 269 microseconds
+Thread number 2 - operating time: 0 seconds 742 milliseconds 228 microseconds
+Thread number 3 - operating time: 0 seconds 742 milliseconds 202 microseconds
+Main program - operating time: 0 seconds 742 milliseconds 605 microseconds
+
+
+Thread number 0 - operating time: 0 seconds 744 milliseconds 494 microseconds
+Thread number 1 - operating time: 0 seconds 744 milliseconds 680 microseconds
+Thread number 2 - operating time: 0 seconds 744 milliseconds 649 microseconds
+Thread number 3 - operating time: 0 seconds 744 milliseconds 641 microseconds
+Thread number 4 - operating time: 0 seconds 744 milliseconds 688 microseconds
+Thread number 5 - operating time: 0 seconds 744 milliseconds 588 microseconds
+Thread number 6 - operating time: 0 seconds 744 milliseconds 648 microseconds
+Thread number 7 - operating time: 0 seconds 744 milliseconds 606 microseconds
+Main program - operating time: 0 seconds 745 milliseconds 9 microseconds
+
+
+Interleaved test
+Thread number 0 - operating time: 0 seconds 275 milliseconds 934 microseconds
+Main program - operating time: 0 seconds 276 milliseconds 310 microseconds
+
+
+Thread number 0 - operating time: 0 seconds 625 milliseconds 878 microseconds
+Thread number 1 - operating time: 0 seconds 625 milliseconds 813 microseconds
+Main program - operating time: 0 seconds 626 milliseconds 143 microseconds
+
+
+Thread number 0 - operating time: 0 seconds 792 milliseconds 891 microseconds
+Thread number 1 - operating time: 0 seconds 792 milliseconds 970 microseconds
+Thread number 2 - operating time: 0 seconds 792 milliseconds 903 microseconds
+Thread number 3 - operating time: 0 seconds 792 milliseconds 880 microseconds
+Main program - operating time: 0 seconds 793 milliseconds 935 microseconds
+
+
+Thread number 0 - operating time: 0 seconds 823 milliseconds 142 microseconds
+Thread number 1 - operating time: 0 seconds 823 milliseconds 126 microseconds
+Thread number 2 - operating time: 0 seconds 823 milliseconds 64 microseconds
+Thread number 3 - operating time: 0 seconds 823 milliseconds 11 microseconds
+Thread number 4 - operating time: 0 seconds 822 milliseconds 989 microseconds
+Thread number 5 - operating time: 0 seconds 822 milliseconds 875 microseconds
+Thread number 6 - operating time: 0 seconds 822 milliseconds 886 microseconds
+Thread number 7 - operating time: 0 seconds 822 milliseconds 875 microseconds
+Main program - operating time: 0 seconds 823 milliseconds 648 microseconds
+
+

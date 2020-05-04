@@ -8,7 +8,6 @@ EXTENSION = .ascii.pgm
 all: clean compile tests
 
 main:
-	# $(CC) $(FLAGS) -o operations -c operations.c
 	$(CC) $(FLAGS)  -o main main.c operations.c -lm -lpthread
 
 compile: main
