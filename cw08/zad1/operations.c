@@ -42,7 +42,7 @@ void semaphoreDecrease(int semId) {
     semaphoreExecute(semId, -1, 0);
 }
 
-void deleteSemaphores(int semId) {
+void deleteSemaphore(int semId) {
     semctl(semId, 0, IPC_RMID);
     if(error("While deleting semaphore")){
         exit(1);   

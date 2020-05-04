@@ -67,8 +67,8 @@ void * sign_mode_function() {
         }
     }
     gettimeofday(&endTime, NULL);
-    int time = ((endTime.tv_sec - startTime.tv_sec) * 1e6) + (endTime.tv_usec = startTime.tv_usec);
-    pthread_exit((void *) (intptr_t) time);
+    int timeValue = ((endTime.tv_sec - startTime.tv_sec) * 1e6) + (endTime.tv_usec - startTime.tv_usec);
+    pthread_exit((void *) (intptr_t) timeValue);
 }
 
 void * block_mode_function() {
@@ -87,8 +87,8 @@ void * block_mode_function() {
         }
     }
     gettimeofday(&endTime, NULL);
-    int time = ((endTime.tv_sec - startTime.tv_sec) * 1e6) + (endTime.tv_usec = startTime.tv_usec);
-    pthread_exit((void *) (intptr_t) time);
+    int timeValue = ((endTime.tv_sec - startTime.tv_sec) * 1e6) + (endTime.tv_usec - startTime.tv_usec);
+    pthread_exit((void *) (intptr_t) timeValue);
 }
 
 void * interleaved_mode_function() {
@@ -105,8 +105,8 @@ void * interleaved_mode_function() {
         i += threadsNumber;
     }
     gettimeofday(&endTime, NULL);
-    int time = ((endTime.tv_sec - startTime.tv_sec) * 1e6) + (endTime.tv_usec = startTime.tv_usec);
-    pthread_exit((void *) (intptr_t) time);
+    int timeValue = ((endTime.tv_sec - startTime.tv_sec) * 1e6) + (endTime.tv_usec - startTime.tv_usec);
+    pthread_exit((void *) (intptr_t) timeValue);
 }
 
 void saveToFile(char * resultFile) {
@@ -134,50 +134,13 @@ void saveToFile(char * resultFile) {
     fclose(rFile);
 }
 
-void printTime(int thread, int microseconds, bool isMain) {
+void printTime(int microseconds) {
     int seconds = microseconds / 1e6;
     microseconds -= seconds * 1e6;
     int miliseconds = microseconds / 1e3;
     microseconds -= miliseconds * 1e3;
-    if (!isMain)
-        printf("Operating time of thread number %d was: %d seconds %d milliseconds %d microseconds\n",thread,seconds,miliseconds,microseconds);
-    else
-        printf("\n\nOperating time of main thread: %d seconds %d milliseconds %d microseconds\n",seconds,miliseconds,microseconds);
+    printf("operating time: %d seconds %d milliseconds %d microseconds\n", seconds, miliseconds, microseconds);
 }
-
-// void printHistogram() {
-//     char decision;
-//     printf("Do you want to see the histogram of results? [y/n]\n");
-//     printf("If yes, please enlargen the terminal\n");
-//     decision = getc(stdin);
-//     if (decision == 'n')
-//         return;
-
-//     int max = 0;
-//     for (int i = 0; i < pixelsNumber; i++)
-//         if(result[i] > max)
-//             max = result[i];
-    
-//     double ratio = 1.0 * max / 100.0;
-
-//     for (int i = 0; i < pixelsNumber; i++) {
-//         int len = result[i] / ratio;
-//         printf("%10s"," ");
-//         for (int j = 0; j < len; j++) {
-//             printf("-");
-//         }
-//         printf("\nPixel %3d |",i);
-//         for (int j=0; j<len-2; j++) {
-//             printf(" ");
-//         }
-//         printf("| %d\n",result[i]);
-//         printf("%10s"," ");
-//         for (int j=0; j<len; j++) {
-//             printf("-");
-//         }
-//         printf("\n");
-//     }
-// }
 
 int main(int argc, char ** argv) {
     if(argc != 5) {
@@ -194,8 +157,6 @@ int main(int argc, char ** argv) {
     }
 
     createImageArray(argv[3]);
-
-    fprintf(stderr,"here\n");
 
     char * resultFile = argv[4];
 
@@ -223,20 +184,21 @@ int main(int argc, char ** argv) {
     for (int i = 0; i < threadsNumber; i++) {
         int timeValue;
         pthread_join(threadsIDs[i], (void**)&timeValue);
-        printTime(i, timeValue, 0);
+        printf("Thread number %d - ", i);
+        printTime(timeValue);
     }
 
     saveToFile(resultFile);
     gettimeofday(&endTime, NULL);
-    int time = ((endTime.tv_sec-startTime.tv_sec) * 1e6) + (endTime.tv_usec-startTime.tv_usec);
-    printTime(-1, time, 1);
+    int timeValue = ((endTime.tv_sec-startTime.tv_sec) * 1e6) + (endTime.tv_usec-startTime.tv_usec);
 
-    // printHistogram();
+    printf("\nMain program - ");
+    printTime(timeValue);
 
     free(imageArray);
     free(threadsIDs);
     free(result);
-    deleteSemaphores(semaphoreID);
+    deleteSemaphore(semaphoreID);
 
     return 0;
 }

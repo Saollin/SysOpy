@@ -23,4 +23,4 @@ int createSemaphore();
 void semaphoreExecute(int semId, int operation, short flag);
 void semaphoreIncrease(int semId);
 void semaphoreDecrease(int semId);
-void deleteSemaphores(int semId);
+void deleteSemaphore(int semId);
