@@ -192,8 +192,9 @@ int main(int argc, char ** argv) {
     gettimeofday(&endTime, NULL);
     int timeValue = ((endTime.tv_sec-startTime.tv_sec) * 1e6) + (endTime.tv_usec-startTime.tv_usec);
 
-    printf("\nMain program - ");
+    printf("Main program - ");
     printTime(timeValue);
+    printf("\n\n");
 
     free(imageArray);
     free(threadsIDs);
