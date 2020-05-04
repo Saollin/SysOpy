@@ -69,7 +69,7 @@ int getThreadIndex(pthread_t id) {
     return -1;
 }
 
-void * sign_mode_function() {
+void * signModeFunction() {
     struct timeval startTime, endTime;
     int threadId = getThreadIndex(pthread_self());
     
@@ -77,12 +77,10 @@ void * sign_mode_function() {
     int pixelUp = pixelDown + pixelsNumber / threadsNumber - 1;
     gettimeofday(&startTime, NULL);
     for(int i = 0; i < rows; i++) {
-        for(int j = 0; j <= columns; j++) {
+        for(int j = 0; j < columns; j++) {
             int pixelValue = imageArray[i][j];
             if(pixelValue >= pixelDown && pixelValue <= pixelUp) {
-                semaphoreDecrease(semaphoreID);
                 result[pixelValue]++;
-                semaphoreIncrease(semaphoreID);
             }
         }
     }
@@ -91,7 +89,7 @@ void * sign_mode_function() {
     pthread_exit((void *) (intptr_t) timeValue);
 }
 
-void * block_mode_function() {
+void * blockModeFunction() {
     struct timeval startTime, endTime;
     int threadId = getThreadIndex(pthread_self());
     
@@ -111,7 +109,7 @@ void * block_mode_function() {
     pthread_exit((void *) (intptr_t) timeValue);
 }
 
-void * interleaved_mode_function() {
+void * interleavedModeFunction() {
     struct timeval startTime, endTime;
     int threadId = getThreadIndex(pthread_self());
     int i = threadId;
@@ -186,13 +184,13 @@ int main(int argc, char ** argv) {
     
     for (int i = 0; i < threadsNumber; i++) {
         if (!strcmp(argv[2],"sign")) {
-            pthread_create(&threadsIDs[i], NULL, sign_mode_function, NULL);
+            pthread_create(&threadsIDs[i], NULL, signModeFunction, NULL);
         }
         else if (!strcmp(argv[2],"block")) {
-            pthread_create(&threadsIDs[i], NULL, block_mode_function, NULL);
+            pthread_create(&threadsIDs[i], NULL, blockModeFunction, NULL);
         }
         else if (!strcmp(argv[2],"interleaved")) {
-            pthread_create(&threadsIDs[i], NULL, interleaved_mode_function, NULL);
+            pthread_create(&threadsIDs[i], NULL, interleavedModeFunction, NULL);
         }
         else {
             fprintf(stderr, "%s is wrong type argument", argv[2]);
@@ -213,6 +211,7 @@ int main(int argc, char ** argv) {
     printf("Main program - ");
     printTime(timeValue);
     printf("\n\n");
+
     free(imageArray);
     free(threadsIDs);
     free(result);
