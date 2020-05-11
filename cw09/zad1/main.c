@@ -9,7 +9,8 @@
 #include <errno.h>
 #include <time.h>
 
-#define GOL_COL "\033[01;31m"
+#define GOL_COL "\033[22;36m"
+#define SERV_COL "\033[01;36m"
 #define DEF_COL "\033[0m"
 
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
@@ -46,7 +47,7 @@ void* barber() {
         if(clients == 1) sprintf(clientForm, "klient");
         else sprintf(clientForm, "klientów");
         printf(GOL_COL"%9s: ", "Golibroda");
-        printf(DEF_COL"Czeka %d %s, golę klienta %d\n", clients, clientForm, servedClient);
+        printf(SERV_COL"Czeka %d %s, golę klienta %d\n"DEF_COL, clients, clientForm, servedClient);
         pthread_mutex_unlock(&mutex);
         sleep(rand() % MAX_WAITING_TIME);
     }
