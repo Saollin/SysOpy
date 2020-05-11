@@ -9,75 +9,78 @@
 #include <errno.h>
 #include <time.h>
 
+#define GOL_COL "\033[01;31m"
+#define DEF_COL "\033[0m"
+
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 const int MAX_WAITING_TIME = 4;
 
-int chairsNumber, clientsNumber;
+int chairsNumber, clientsNumber, freeChairs;
 int *waitRoom;
 int servedClient;
-bool areClients = false;
+bool doesBarberSleep = true;
 
 void* barber() {
-    while(true) {
+    for(int j = 0; j < clientsNumber; j++) {
         pthread_mutex_lock(&mutex);
-        int clients = 0;
+        while(freeChairs == chairsNumber) {
+            printf(GOL_COL"%9s: ", "Golibroda");
+            printf(DEF_COL"Idę spać\n");
+            doesBarberSleep = true;
+            pthread_cond_wait(&cond, &mutex);
+        }
         int placeIndex = 0;
         for(int i = 0; i < chairsNumber; i++) {
             if(waitRoom[i] != 0) {
                 servedClient = waitRoom[i];
                 placeIndex = i;
-                clients++;
+                break;
             }
         }
-        if(clients == 0) {
-            areClients = false;
-        }
-        else {
-            waitRoom[placeIndex] = 0;
-        }
-
-        while(!areClients) {
-            printf("Golibroda: idę spać\n");
-            pthread_cond_wait(&cond, &mutex);
-        }
+        waitRoom[placeIndex] = 0;
+        freeChairs++;
+        int clients = chairsNumber - freeChairs;
+        char * clientForm = calloc(10, sizeof(char));
+        if(clients == 1) sprintf(clientForm, "klient");
+        else sprintf(clientForm, "klientów");
+        printf(GOL_COL"%9s: ", "Golibroda");
+        printf(DEF_COL"Czeka %d %s, golę klienta %d\n", clients, clientForm, servedClient);
         pthread_mutex_unlock(&mutex);
-        printf("Golibroda: czeka %d klientów, golę klienta %d\n", clients, servedClient);
         sleep(rand() % MAX_WAITING_TIME);
     }
+    printf(GOL_COL"%9s: ", "Golibroda");
+    printf(DEF_COL"Koniec pracy\n");
     return NULL;
 }
 
 void* client(void * arg) {
     int id = *((int *) arg);
-    int freeChairs = 0;
-    while(!freeChairs) {
+    bool wasServed = false;
+    while(!wasServed) {
         pthread_mutex_lock(&mutex);
-        if(!areClients) {
-            areClients = true;
-            servedClient = id;
-            pthread_cond_broadcast(&cond);
-            printf("Budzę golibrodę; %d\n", id);
-        }
-        else {
-            freeChairs = 0;
-            bool hasSat = false;
+        if(freeChairs != 0) {
             for(int i = 0; i < chairsNumber; i++) {
                 if(waitRoom[i] == 0) {
-                    freeChairs++;
-                    if(!hasSat) {
-                        hasSat = true;
-                        waitRoom[i] =  id;
-                    }
+                    waitRoom[i] =  id;
+                    break;
                 }
             }
-            if(freeChairs != 0) {
-                printf("Poczekalnia, wolne miejsca: %d; %d\n", freeChairs - 1, id);
+            freeChairs--;
+            printf("%6s %-2d: ", "Klient", id);
+            printf("Poczekalnia, wolne miejsca: %d\n", freeChairs);
+            if(doesBarberSleep) {
+                doesBarberSleep = false;
+                pthread_cond_broadcast(&cond);
+                printf("%6s %-2d: ", "Klient", id);
+                printf("Budzę golibrodę\n");
             }
-            else {
-                printf("Zajęte; %d\n", id);
-            }
+            wasServed = true;
+        }
+        else {
+            printf("%6s %-2d: ", "Klient", id);
+            printf("Zajęte\n");
         }
         pthread_mutex_unlock(&mutex);
         sleep((rand() % MAX_WAITING_TIME) + 1);
@@ -97,7 +100,7 @@ int main(int argc, char ** argv) {
         return -1;
     }
     srand(time(NULL));
-    chairsNumber = atoi(argv[1]);
+    freeChairs = chairsNumber = atoi(argv[1]);
     clientsNumber = atoi(argv[2]);
     
     waitRoom = calloc(chairsNumber, sizeof(int));
