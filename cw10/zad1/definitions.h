@@ -1,11 +1,28 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
+#include <pthread.h>
+#include <netdb.h> 
+#include <sys/stat.h>
+#include <sys/un.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <sys/epoll.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#include <errno.h>
 #include <stdbool.h>
 
 typedef struct gameData { 
-    char lastSymbol; 
+    char whoseTurn; 
     char board[9];
 } gameData;
 
-typedef enum clientState { None, Init, Wait, Play } clientState;
+typedef enum clientState { None, Init, Waiting, Playing } clientState;
 
 typedef struct client {
     int fd;
@@ -23,13 +40,13 @@ typedef struct event {
     eventState type;
     union value {
         client * client;
-        int socket;
+        int sockfd;
     } value;
 } event;
 
 typedef enum msgType { Disconnect, 
-Start, Move, EndOfGame, StateOfGame,
-Ping, ServerFull, Wait, NickNotAvailable
+StartOfGame, Move, EndOfGame, StateOfGame,
+Ping, FullServer, Wait, NickNotAvailable
 } msgType;
 
 typedef struct msg {
@@ -38,6 +55,6 @@ typedef struct msg {
         struct { char nick[20]; char symbol; } startInfo;
         int move;
         gameData state;
-        char end;
+        char winner;
     } value;
 } msg;
