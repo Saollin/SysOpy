@@ -7,7 +7,7 @@ int epfd;
 client * waitingClient = NULL;
 client ** clients;
 
-const int windConditions[8][3] = {
+int winConditions[8][3] = {
     {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // rows
     {0, 3, 6}, {1, 4, 7}, {2, 5, 8}, // columns
     {0, 4, 8}, {2, 4, 6} // diagonals
@@ -25,7 +25,7 @@ client * initNewClient(int clientfd) {
     pthread_mutex_lock(&mutex);
     int index = -1;
     for(int i = 0; i < maxConnections; i++) {
-        if(clients[0]->state == None) {
+        if(clients[i]->state == None) {
             index = i;
             break;
         }
@@ -66,12 +66,13 @@ void sendGameData(client * to) {
 }
 
 bool checkWin(client * clnt) {
-    char * gameBoard = clnt->game->board;
+    // char ** gameBoard = clnt->game->board;
     char symbol = clnt->symbol;
     for(int i = 0; i < 8; i++) {
-        if(gameBoard[windConditions[i][0]] == symbol 
-        && gameBoard[windConditions[i][1]] == symbol 
-        && gameBoard[windConditions[i][2]] == symbol) {
+        int * cond = winConditions[i];
+        if(clnt->game->board[cond[0] / 3][cond[0] % 3] == symbol 
+        && clnt->game->board[cond[1] / 3][cond[1] % 3] == symbol 
+        && clnt->game->board[cond[2] / 3][cond[2] % 3] == symbol) {
             return true;
         }
     }
@@ -80,7 +81,7 @@ bool checkWin(client * clnt) {
 
 bool checkDraw(client * clnt) {
     for(int i = 0; i < 9; i++) {
-        if(clnt->game->board[i] == '-') {
+        if(clnt->game->board[i / 3][i % 3] == '-') {
             return false;
         }
     }
@@ -90,12 +91,17 @@ bool checkDraw(client * clnt) {
 void pairClients(client * first, client * second) {
     char firstSymbol = 'x';
     char secondSymbol = 'o';
+    if(rand() % 2 == 0) {
+        firstSymbol = 'o';
+        secondSymbol = 'x';
+    }
 
     first->state = second->state = Playing;
     first->opponent = second;
     second->opponent = first;
     first->game = second->game = calloc(1, sizeof(gameData));
     memset(first->game->board, '-', 9);
+
 
     msg newMsg;
     newMsg.type = StartOfGame;
@@ -107,13 +113,7 @@ void pairClients(client * first, client * second) {
     second->symbol = newMsg.value.startInfo.symbol = secondSymbol;
     send(second->fd, &newMsg, sizeof newMsg, 0);
 
-    if(rand() % 2 == 0) {
-        first->game->whoseTurn = first->symbol;
-    }
-    else {
-        first->game->whoseTurn = second->symbol;
-    }
-    
+    first->game->whoseTurn = 'x';
     sendGameData(first);
     sendGameData(second);
 }
@@ -121,27 +121,34 @@ void pairClients(client * first, client * second) {
 void handleClient(client * handledClient) {
     if(handledClient->state == Init) {
         int nickSize = read(handledClient->fd, handledClient->nick, sizeof handledClient->nick - 1);
-        int j = handledClient - clients;
+        fprintf(stderr, "%s\n", handledClient->nick); 
         pthread_mutex_lock(&mutex);
+        bool isNickAvailable = true;
         for(int i = 0; i < maxConnections; i++) {
-            if(i != j && !strcmp(handledClient->nick, clients[i]->nick)) {
-                msg newMsg;
-                newMsg.type = NickNotAvailable;
-                send(handledClient->fd, &newMsg, sizeof newMsg, 0);
-                deleteClient(handledClient);
+            if(handledClient != clients[i] && strcmp(handledClient->nick, clients[i]->nick) == 0) {
+                fprintf(stderr, "%s\n", clients[i]->nick);
+                isNickAvailable = false;
+                break;
+            }
+        }
+        if(!isNickAvailable){
+            msg newMsg;
+            newMsg.type = NickNotAvailable;
+            send(handledClient->fd, &newMsg, sizeof newMsg, 0);
+            deleteClient(handledClient);
+        }
+        else {
+            handledClient->nick[nickSize] = '\0';
+            if(waitingClient != NULL) {
+                pairClients(handledClient, waitingClient);
+                waitingClient = NULL;
             }
             else {
-                if(waitingClient) {
-                    pairClients(handledClient, waitingClient);
-                    waitingClient = NULL;
-                }
-                else {
-                    msg newMsg;
-                    newMsg.type = Wait;
-                    send(handledClient->fd, &newMsg, sizeof newMsg, 0);
-                    waitingClient = handledClient;
-                    handledClient->state = Waiting;
-                }
+                msg newMsg;
+                newMsg.type = Wait;
+                send(handledClient->fd, &newMsg, sizeof newMsg, 0);
+                waitingClient = handledClient;
+                handledClient->state = Waiting;
             }
         }
         pthread_mutex_unlock(&mutex);
@@ -158,9 +165,9 @@ void handleClient(client * handledClient) {
             int move = newMsg.value.move;
             gameData * game = handledClient->game;
             if(game->whoseTurn == handledClient->symbol
-            && game->board[move] == '-'
+            && game->board[move / 3][move % 3] == '-'
             && 0 <= move && move <= 8) {
-                game->board[move] = handledClient->symbol;
+                game->board[move /3][move % 3] = handledClient->symbol;
                 game->whoseTurn = handledClient->opponent->symbol;
                 sendGameData(handledClient);
                 sendGameData(handledClient->opponent);
@@ -186,8 +193,12 @@ void handleClient(client * handledClient) {
 }
 
 void initSocket(int sockfd, void * addr, int size) {
+    int yes = 1;
+    if(setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, (char *)&yes, sizeof(yes)) == -1) {
+        error("Failed setsockopt");
+    }
     if(bind(sockfd, (struct sockaddr *) addr, size) == -1) {
-        error("While binding socket");
+        error("Failed binding socket");
     }
     if(listen(sockfd, maxConnections));
     struct epoll_event newEvent;
@@ -222,11 +233,11 @@ void * pingFunc() {
 
 void init() {
     if((epfd = epoll_create1(0)) == -1){
-        error("Creating epoll");
+        error("Failed to creating epoll");
     }
     clients = calloc(maxConnections, sizeof(client *));
     for(int i = 0; i < maxConnections; i++) {
-        clients[i] = calloc(1, sizeof(client));
+        clients[i] = (client *) calloc(1, sizeof(client));
         clients[i]->state = None;
     }
 }
@@ -238,27 +249,33 @@ int main(int argc, char ** argv) {
     }
     int portNumber = atoi(argv[1]);
     char * pathOfSocket = argv[2];
-    unlink(pathOfSocket);
     init();
-
-    struct sockaddr_un local;
-    local.sun_family = AF_UNIX;
-    strcpy(local.sun_path, pathOfSocket);
-    int localSock = socket(AF_UNIX, SOCK_STREAM, 0);
-    if(localSock == -1){
-        error("Creating local socket");
-    }
-    initSocket(localSock, &local, sizeof(struct sockaddr_un));
 
     struct sockaddr_in web;
     web.sin_family = AF_INET;
     web.sin_port = htons(portNumber);
     web.sin_addr.s_addr = htonl(INADDR_ANY);
-    int webSock = socket(AF_UNIX, SOCK_STREAM, 0);
+    
+    int webSock = socket(AF_INET, SOCK_STREAM, 0);
     if(webSock == -1){
-        error("Creating web socket");
+        error("Failed creating web socket");
     }
-    initSocket(webSock, &web, sizeof(struct sockaddr_in));
+    initSocket(webSock, &web, sizeof web);
+    fprintf(stderr, "Creating web socket\n");
+
+    struct sockaddr_un local;
+    memset(&local, 0, sizeof(local));
+    local.sun_family = AF_UNIX;
+    strncpy(local.sun_path, pathOfSocket, sizeof(local.sun_path) -1);
+    
+    fprintf(stderr, "Creating local socket\n");
+    int localSock = socket(AF_UNIX, SOCK_STREAM, 0);
+    if(localSock == -1){
+        error("Failed creating local socket");
+    }
+    
+    unlink(pathOfSocket);
+    initSocket(localSock, &local, sizeof local);
 
     pthread_t pingThread;
     pthread_create(&pingThread, NULL, pingFunc, NULL);
@@ -267,11 +284,11 @@ int main(int argc, char ** argv) {
     while(true) {
         int numberOfEvents = epoll_wait(epfd, events, 10, -1);
         if(numberOfEvents == -1) {
-            error("In epoll_wait");
+            error("Failed in epoll_wait");
         }
         for(int i = 0; i < numberOfEvents; i++) {
             event * readEvent = events[i].data.ptr;
-            if(readEvent->type = Socket) {
+            if(readEvent->type == Socket) {
                 int clientfd = accept(readEvent->value.sockfd, NULL, NULL);
                 client * newClient = initNewClient(clientfd);
                 if(newClient == NULL) {
@@ -280,7 +297,7 @@ int main(int argc, char ** argv) {
                     send(clientfd, &newMsg, sizeof newMsg, 0);
                     close(clientfd);
                     continue;
-                } 
+                }
                 event * clientData = calloc(1, sizeof(event));
                 clientData->type = Client;
                 clientData->value.client = newClient;
@@ -288,16 +305,18 @@ int main(int argc, char ** argv) {
                 newEvent.events = EPOLLIN | EPOLLET | EPOLLHUP;
                 newEvent.data.ptr = clientData;
                 if((epoll_ctl(epfd, EPOLL_CTL_ADD, clientfd, &newEvent)) == -1) {
-                    error("While epoll_ctl for new client");
+                    error("Failed epoll_ctl for new client");
                 }
             }
-            else if(readEvent->type = Client) {
+            else if(readEvent->type == Client) {
                 if(events[i].events & EPOLLHUP) {
                     pthread_mutex_lock(&mutex);
                     deleteClient(readEvent->value.client);
                     pthread_mutex_unlock(&mutex);
                 }
-                else handleClient(readEvent->value.client);
+                else {
+                    handleClient(readEvent->value.client);
+                }
             }
         }
     }

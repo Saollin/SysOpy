@@ -19,7 +19,7 @@
 
 typedef struct gameData { 
     char whoseTurn; 
-    char board[9];
+    char board[3][3];
 } gameData;
 
 typedef enum clientState { None, Init, Waiting, Playing } clientState;
@@ -27,7 +27,7 @@ typedef enum clientState { None, Init, Waiting, Playing } clientState;
 typedef struct client {
     int fd;
     clientState state;
-    client * opponent;
+    struct client * opponent;
     char nick[20];
     char symbol;
     gameData * game;
