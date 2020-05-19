@@ -56,8 +56,6 @@ int initWebSocket(char* ipv4, int port) {
 void clearLine() {
     printf("\33[A\33[2K\r");
 }
-static const char emptyLine[] =
-"\t   |   |   \n";
 
 static const char symbolLine[] = 
 "\t%s|%s|%s\n";
@@ -66,13 +64,11 @@ static const char crossLine[] =
 "\t─┼─┼─\n";
 
 static const char board[] =
-"\t   |   |   \n"
 "\t 1 | 2 | 3 \n"
-"\t───┼───┼───\n"
+"\t─── ─── ───\n"
 "\t 4 | 5 | 6 \n"
-"\t───┼───┼───\n"
-"\t 7 | 8 | 9 \n"
-"\t   |   |   \n";
+"\t─── ─── ───\n"
+"\t 7 | 8 | 9 \n";
 
 char * changeColor(char symbol) {
     char * result = calloc(20, sizeof(char));
@@ -110,7 +106,6 @@ void updateState() {
     for(int i = 0; i < 6; i++) {
         clearLine();
     }
-    // printf("\033[6A");
     displayState();
 }
 
@@ -119,7 +114,7 @@ void initDisplay() {
     printf("Your nick is %s\nYour opponent's nick: %s\n\n", nick, opponentNick);
     printf(HELP_COL"Numbers of cells: \n");
     printf(board);
-    printf("\nYou sign is: %c\n\n"DEF_COL, mySymbol);
+    printf("\nYou sign is: "MY_COL"%c\n\n"DEF_COL, mySymbol);
     printf("\033[s"); //save cursor
     displayState();
 }
@@ -171,6 +166,7 @@ int main(int argc, char **argv) {
         for(int i = 0; i < numberOfEvents; i++) {
             if(events[i].data.fd == STDIN_FILENO) {
                 int move;
+                clearLine();
                 if(scanf("%d", &move) != 1) {
                     char x;
                     while((x = getchar()) != EOF && x != '\n'); //pomin niewłaciwe wyjście
