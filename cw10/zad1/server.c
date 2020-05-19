@@ -40,18 +40,13 @@ client * initNewClient(int clientfd) {
 }
 
 void deleteClient(client * deleted) {
+    printf("Player %s was deleted\n", deleted->nick);
     if(deleted == waitingClient) {
         waitingClient = NULL;
     }
-    if(deleted->opponent) {
-        client * opponent = deleted->opponent;
-        opponent->opponent = NULL;
-        opponent->game = NULL;
-        deleteClient(deleted->opponent);
-        free(deleted->game);
-        deleted->opponent = NULL;
-        deleted->game = NULL;
-    }
+    free(deleted->game);
+    deleted->opponent = NULL;
+    deleted->game = NULL;
     deleted->state = None;
     deleted->nick[0] = 0;
     epoll_ctl(epfd, EPOLL_CTL_DEL, deleted->fd, NULL);
@@ -89,6 +84,7 @@ bool checkDraw(client * clnt) {
 }
 
 void pairClients(client * first, client * second) {
+    printf("Now player %s plays with %s\n", first->nick, second->nick);
     char firstSymbol = 'x';
     char secondSymbol = 'o';
     if(rand() % 2 == 0) {
@@ -121,12 +117,10 @@ void pairClients(client * first, client * second) {
 void handleClient(client * handledClient) {
     if(handledClient->state == Init) {
         int nickSize = read(handledClient->fd, handledClient->nick, sizeof handledClient->nick - 1);
-        fprintf(stderr, "%s\n", handledClient->nick); 
         pthread_mutex_lock(&mutex);
         bool isNickAvailable = true;
         for(int i = 0; i < maxConnections; i++) {
             if(handledClient != clients[i] && strcmp(handledClient->nick, clients[i]->nick) == 0) {
-                fprintf(stderr, "%s\n", clients[i]->nick);
                 isNickAvailable = false;
                 break;
             }
@@ -139,11 +133,13 @@ void handleClient(client * handledClient) {
         }
         else {
             handledClient->nick[nickSize] = '\0';
+            printf("New player: %s\n", handledClient->nick);
             if(waitingClient != NULL) {
                 pairClients(handledClient, waitingClient);
                 waitingClient = NULL;
             }
             else {
+                printf("Player: %s is waiting\n", handledClient->nick);
                 msg newMsg;
                 newMsg.type = Wait;
                 send(handledClient->fd, &newMsg, sizeof newMsg, 0);
@@ -261,21 +257,20 @@ int main(int argc, char ** argv) {
         error("Failed creating web socket");
     }
     initSocket(webSock, &web, sizeof web);
-    fprintf(stderr, "Creating web socket\n");
+    printf("Creating web socket on port: %d\n", portNumber);
 
     struct sockaddr_un local;
     memset(&local, 0, sizeof(local));
     local.sun_family = AF_UNIX;
     strncpy(local.sun_path, pathOfSocket, sizeof(local.sun_path) -1);
     
-    fprintf(stderr, "Creating local socket\n");
     int localSock = socket(AF_UNIX, SOCK_STREAM, 0);
     if(localSock == -1){
         error("Failed creating local socket");
     }
-    
     unlink(pathOfSocket);
     initSocket(localSock, &local, sizeof local);
+    printf("Creating local socket with path: %s\n", pathOfSocket);
 
     pthread_t pingThread;
     pthread_create(&pingThread, NULL, pingFunc, NULL);
@@ -292,6 +287,7 @@ int main(int argc, char ** argv) {
                 int clientfd = accept(readEvent->value.sockfd, NULL, NULL);
                 client * newClient = initNewClient(clientfd);
                 if(newClient == NULL) {
+                    printf("Server is full\n");
                     msg newMsg;
                     newMsg.type = FullServer;
                     send(clientfd, &newMsg, sizeof newMsg, 0);

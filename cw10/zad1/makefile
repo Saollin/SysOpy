@@ -19,6 +19,7 @@ name="Greg"
 runClientWeb: client
 	./client $(name) web 127.0.0.1 8000
 
+name="Piotr"
 runClientUnix: client
 	./client $(name) unix .socket 
 
