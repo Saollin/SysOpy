@@ -20,15 +20,37 @@ void error(char * message) {
     return;
 }
 
+char* randomName() {
+    char* name = calloc(12, sizeof(char));
+    sprintf(name, ".socket");
+    for (int i = 7; i < 11; i++) {
+        char letter = 'a' + (rand() % 26);
+        name[i] = letter;
+    }
+    name[11] = '\0';
+    return name;
+}
+
 int initUnixSocket(char * path) {
     struct  sockaddr_un local;
     memset(&local, 0, sizeof local);
     local.sun_family = AF_UNIX;
     strcpy(local.sun_path, path);
-    int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    int fd = socket(AF_UNIX, SOCK_DGRAM, 0);
     if(fd == -1) {
         error("While creating unix socket");
     }
+
+    struct sockaddr_un bindLocal;
+    memset(&bindLocal, 0, sizeof bindLocal);
+    bindLocal.sun_family = AF_UNIX;
+    char * sockName = randomName();
+    unlink(sockName);
+    strncpy(bindLocal.sun_path, sockName, sizeof bindLocal.sun_path);
+    if(bind(fd, (struct sockaddr *) &bindLocal, sizeof bindLocal) == -1) {
+        error("While binding unix socket");
+    }
+
     if(connect(fd, (struct sockaddr *) &local, sizeof local) == -1) {
         error("While connecting unix socket");
     } 
@@ -43,7 +65,7 @@ int initWebSocket(char* ipv4, int port) {
     if(inet_pton(AF_INET, ipv4, &web.sin_addr) <= 0) {
         error("Invalid ip adress");
     }
-    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
     if(fd == -1) {
         error("While creating web socket");
     }
@@ -139,8 +161,11 @@ int main(int argc, char **argv) {
     }
 
     signal(SIGINT, sigintHandler);
-    nick = argv[1];
-    send(sockfd, nick, strlen(nick), 0);
+
+    msg newMsg;
+    newMsg.type = Connect;
+    strcpy(newMsg.value.nick, argv[1]);
+    send(sockfd, &newMsg, sizeof newMsg, 0);
 
     if((epfd = epoll_create1(0)) == -1){
         error("Creating epoll");
@@ -156,7 +181,6 @@ int main(int argc, char **argv) {
     socketEvent.data.fd = sockfd;
     epoll_ctl(epfd, EPOLL_CTL_ADD, sockfd, &socketEvent);
 
-    // int move;
     struct epoll_event events[2];
     while(true) {
         int numberOfEvents = epoll_wait(epfd, events, 10, -1);
@@ -180,12 +204,12 @@ int main(int argc, char **argv) {
                     msg newMsg;
                     newMsg.type = Move;
                     newMsg.value.move = move;
-                    send(sockfd, &newMsg, sizeof newMsg, 0);
+                    sendto(sockfd, &newMsg, sizeof newMsg, 0, NULL, sizeof(struct sockaddr_in));
                 }
             } 
             else {
                 msg newMsg;
-                recv(sockfd, &newMsg, sizeof newMsg, 0);
+                recvfrom(sockfd, &newMsg, sizeof newMsg, 0, NULL, 0);
                 if (newMsg.type == Wait) {
                     printf("Wait for an opponent\n");
                 }
@@ -203,6 +227,9 @@ int main(int argc, char **argv) {
                 else if (newMsg.type == FullServer) {
                     printf("Server is full. There is no place for you!\n");
                     close(sockfd);
+                    exit(0);
+                }
+                else if(newMsg.type == Disconnect) {
                     exit(0);
                 }
                 else if (newMsg.type == Ping) {

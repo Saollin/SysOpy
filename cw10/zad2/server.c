@@ -21,22 +21,86 @@ void error(char * message) {
     return;
 }
 
-client * initNewClient(int clientfd) {
+void sendGameData(client * to) {
+    msg newMsg;
+    newMsg.type = StateOfGame;
+    memcpy(&newMsg.value.state, to->game, sizeof (gameData));
+    sendto(to->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &to->addr, to->addrLength);
+}
+
+void pairClients(client * first, client * second) {
+    printf("Now player %s plays with %s\n", first->nick, second->nick);
+    char firstSymbol = 'x';
+    char secondSymbol = 'o';
+    if(rand() % 2 == 0) {
+        firstSymbol = 'o';
+        secondSymbol = 'x';
+    }
+
+    first->state = second->state = Playing;
+    first->opponent = second;
+    second->opponent = first;
+    first->game = second->game = calloc(1, sizeof(gameData));
+    memset(first->game->board, '-', 9);
+
+    msg newMsg;
+    newMsg.type = StartOfGame;
+    strcpy(newMsg.value.startInfo.nick, second->nick);
+    first->symbol = newMsg.value.startInfo.symbol = firstSymbol;
+    sendto(first->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &first->addr, first->addrLength);
+
+    strcpy(newMsg.value.startInfo.nick, first->nick);
+    second->symbol = newMsg.value.startInfo.symbol = secondSymbol;
+    sendto(second->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &second->addr, second->addrLength);
+
+    first->game->whoseTurn = 'x';
+    sendGameData(first);
+    sendGameData(second);
+}
+
+void initNewClient(union sAddr * addr, socklen_t length, int clientfd, char * nick) {
     pthread_mutex_lock(&mutex);
     int index = -1;
     for(int i = 0; i < maxConnections; i++) {
         if(clients[i]->state == None) {
             index = i;
-            break;
+        }
+        else if(!strcmp(nick, clients[i]->nick)) {
+            pthread_mutex_unlock(&mutex);
+            msg newMsg;
+            newMsg.type = NickNotAvailable;
+            sendto(clientfd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) addr, length);
+            return;
         }
     }
-    if(index == -1) return NULL;
+    if(index == -1) {
+        pthread_mutex_unlock(&mutex);
+        printf("Server is full\n");
+        msg newMsg;
+        newMsg.type = FullServer;
+        sendto(clientfd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) addr, length);
+        return;
+    }
+    printf("New player: %s\n", nick);
     client* newClient = clients[index];
     newClient->fd = clientfd;
-    newClient->state = Init;
+    memcpy(&newClient->addr, addr, length);
+    newClient->addrLength = length;
     newClient->isActive = true;
+    strcpy(newClient->nick, nick);
+    if(waitingClient != NULL) {
+        pairClients(newClient, waitingClient);
+        waitingClient = NULL;
+    }
+    else {
+        printf("Player: %s is waiting\n", nick);
+        waitingClient = newClient;
+        newClient->state = Waiting;
+        msg newMsg;
+        newMsg.type = Wait;
+        sendto(clientfd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) addr, length);
+    }
     pthread_mutex_unlock(&mutex);
-    return newClient;
 }
 
 void deleteClient(client * deleted) {
@@ -44,20 +108,20 @@ void deleteClient(client * deleted) {
     if(deleted == waitingClient) {
         waitingClient = NULL;
     }
+    msg newMsg;
+    newMsg.type = Disconnect;
+    sendto(deleted->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &deleted->addr, deleted->addrLength);
     free(deleted->game);
+    memset(&deleted->addr, 0, sizeof deleted->addr);
+    if(deleted->opponent) {
+        client * op = deleted->opponent;
+        deleted->opponent = NULL;
+        deleteClient(op);
+    }
     deleted->opponent = NULL;
     deleted->game = NULL;
     deleted->state = None;
     deleted->nick[0] = 0;
-    epoll_ctl(epfd, EPOLL_CTL_DEL, deleted->fd, NULL);
-    close(deleted->fd);
-}
-
-void sendGameData(client * to) {
-    msg newMsg;
-    newMsg.type = StateOfGame;
-    memcpy(&newMsg.value.state, to->game, sizeof (gameData));
-    send(to->fd, &newMsg, sizeof newMsg, 0);
 }
 
 bool checkWin(client * clnt) {
@@ -83,108 +147,46 @@ bool checkDraw(client * clnt) {
     return true;
 }
 
-void pairClients(client * first, client * second) {
-    printf("Now player %s plays with %s\n", first->nick, second->nick);
-    char firstSymbol = 'x';
-    char secondSymbol = 'o';
-    if(rand() % 2 == 0) {
-        firstSymbol = 'o';
-        secondSymbol = 'x';
-    }
-
-    first->state = second->state = Playing;
-    first->opponent = second;
-    second->opponent = first;
-    first->game = second->game = calloc(1, sizeof(gameData));
-    memset(first->game->board, '-', 9);
-
-
-    msg newMsg;
-    newMsg.type = StartOfGame;
-    strcpy(newMsg.value.startInfo.nick, second->nick);
-    first->symbol = newMsg.value.startInfo.symbol = firstSymbol;
-    send(first->fd, &newMsg, sizeof newMsg, 0);
-
-    strcpy(newMsg.value.startInfo.nick, first->nick);
-    second->symbol = newMsg.value.startInfo.symbol = secondSymbol;
-    send(second->fd, &newMsg, sizeof newMsg, 0);
-
-    first->game->whoseTurn = 'x';
-    sendGameData(first);
-    sendGameData(second);
-}
-
-void handleClient(client * handledClient) {
-    if(handledClient->state == Init) {
-        int nickSize = read(handledClient->fd, handledClient->nick, sizeof handledClient->nick - 1);
+void handleClientMessage(client * sender, msg received) {
+    if(received.type == Ping) {
         pthread_mutex_lock(&mutex);
-        bool isNickAvailable = true;
-        for(int i = 0; i < maxConnections; i++) {
-            if(handledClient != clients[i] && strcmp(handledClient->nick, clients[i]->nick) == 0) {
-                isNickAvailable = false;
-                break;
-            }
-        }
-        if(!isNickAvailable){
-            msg newMsg;
-            newMsg.type = NickNotAvailable;
-            send(handledClient->fd, &newMsg, sizeof newMsg, 0);
-            deleteClient(handledClient);
-        }
-        else {
-            handledClient->nick[nickSize] = '\0';
-            printf("New player: %s\n", handledClient->nick);
-            if(waitingClient != NULL) {
-                pairClients(handledClient, waitingClient);
-                waitingClient = NULL;
-            }
-            else {
-                printf("Player: %s is waiting\n", handledClient->nick);
-                msg newMsg;
-                newMsg.type = Wait;
-                send(handledClient->fd, &newMsg, sizeof newMsg, 0);
-                waitingClient = handledClient;
-                handledClient->state = Waiting;
-            }
-        }
+        sender->isActive = true;
         pthread_mutex_unlock(&mutex);
     }
-    else {
-        msg newMsg;
-        read(handledClient->fd, &newMsg, sizeof newMsg);
-        if(newMsg.type == Ping) {
-            pthread_mutex_lock(&mutex);
-            handledClient->isActive = true;
-            pthread_mutex_unlock(&mutex);
-        }
-        else if (newMsg.type == Move) {
-            int move = newMsg.value.move;
-            gameData * game = handledClient->game;
-            if(game->whoseTurn == handledClient->symbol
-            && game->board[move / 3][move % 3] == '-'
-            && 0 <= move && move <= 8) {
-                game->board[move /3][move % 3] = handledClient->symbol;
-                game->whoseTurn = handledClient->opponent->symbol;
-                sendGameData(handledClient);
-                sendGameData(handledClient->opponent);
-                if (checkWin(handledClient)) {
-                    newMsg.type = EndOfGame;
-                    newMsg.value.winner =  handledClient->symbol;
-                }
-                else if (checkDraw(handledClient)) {
-                    newMsg.type = EndOfGame;
-                    newMsg.value.winner = '-';
-                }
-                if(newMsg.type == EndOfGame) {
-                    handledClient->opponent->opponent = NULL;
-                    send(handledClient->fd, &newMsg, sizeof newMsg, 0);
-                    send(handledClient->opponent->fd, &newMsg, sizeof newMsg, 0);
-                }
+    else if (received.type == Move) {
+        int move = received.value.move;
+        gameData * game = sender->game;
+        if(game->whoseTurn == sender->symbol
+        && game->board[move / 3][move % 3] == '-'
+        && 0 <= move && move <= 8) {
+            game->board[move /3][move % 3] = sender->symbol;
+            game->whoseTurn = sender->opponent->symbol;
+            sendGameData(sender);
+            sendGameData(sender->opponent);
+            msg newMsg;
+            if (checkWin(sender)) {
+                fprintf(stderr, "h\n");
+                newMsg.type = EndOfGame;
+                newMsg.value.winner =  sender->symbol;
             }
-            else {
-                sendGameData(handledClient);
+            else if (checkDraw(sender)) {
+                newMsg.type = EndOfGame;
+                newMsg.value.winner = '-';
+            }
+            if(newMsg.type == EndOfGame) {
+                sender->opponent->opponent = NULL;
+                sendto(sender->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &sender->addr, sender->addrLength);
+                sendto(sender->opponent->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &sender->opponent->addr, sender->opponent->addrLength);
             }
         }
+        else {
+            sendGameData(sender);
+        }
+    }
+    else if(received.type == Disconnect) {
+        pthread_mutex_lock(&mutex);
+        deleteClient(sender);
+        pthread_mutex_unlock(&mutex);
     }
 }
 
@@ -196,13 +198,9 @@ void initSocket(int sockfd, void * addr, int size) {
     if(bind(sockfd, (struct sockaddr *) addr, size) == -1) {
         error("Failed binding socket");
     }
-    if(listen(sockfd, maxConnections));
     struct epoll_event newEvent;
     newEvent.events = EPOLLIN | EPOLLPRI;
-    event * eventPtr = malloc(sizeof(event));
-    newEvent.data.ptr = eventPtr;
-    eventPtr->type = Socket;
-    eventPtr->value.sockfd = sockfd;
+    newEvent.data.fd = sockfd;
     epoll_ctl(epfd, EPOLL_CTL_ADD, sockfd, &newEvent);
 }
 
@@ -212,11 +210,12 @@ void * pingFunc() {
     while(true) {
         sleep(8);
         pthread_mutex_lock(&mutex);
+        printf("Ping to clients\n");
         for(int i = 0; i < maxConnections; i++) {
             if(clients[i]->state != None) {
                 if(clients[i]->isActive) {
                     clients[i]->isActive = false;
-                    send(clients[i]->fd, &newMsg, sizeof newMsg, 0);
+                    sendto(clients[i]->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr *) &clients[i]->addr, clients[i]->addrLength);
                 }
                 else {
                     deleteClient(clients[i]);
@@ -238,6 +237,15 @@ void init() {
     }
 }
 
+int findClientIndex(union sAddr * addr, socklen_t length) {
+    for(int i = 0; i < maxConnections; i++) {
+        if(!memcmp(&clients[i]->addr, addr, length)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 int main(int argc, char ** argv) {
     if(argc != 3) {
         printf("Wrong number of arguments!\n");
@@ -251,8 +259,7 @@ int main(int argc, char ** argv) {
     web.sin_family = AF_INET;
     web.sin_port = htons(portNumber);
     web.sin_addr.s_addr = htonl(INADDR_ANY);
-    
-    int webSock = socket(AF_INET, SOCK_STREAM, 0);
+    int webSock = socket(AF_INET, SOCK_DGRAM, 0);
     if(webSock == -1){
         error("Failed creating web socket");
     }
@@ -262,9 +269,9 @@ int main(int argc, char ** argv) {
     struct sockaddr_un local;
     memset(&local, 0, sizeof(local));
     local.sun_family = AF_UNIX;
-    strncpy(local.sun_path, pathOfSocket, sizeof(local.sun_path) -1);
+    strncpy(local.sun_path, pathOfSocket, sizeof(local.sun_path));
     
-    int localSock = socket(AF_UNIX, SOCK_STREAM, 0);
+    int localSock = socket(AF_UNIX, SOCK_DGRAM, 0);
     if(localSock == -1){
         error("Failed creating local socket");
     }
@@ -282,37 +289,17 @@ int main(int argc, char ** argv) {
             error("Failed in epoll_wait");
         }
         for(int i = 0; i < numberOfEvents; i++) {
-            event * readEvent = events[i].data.ptr;
-            if(readEvent->type == Socket) {
-                int clientfd = accept(readEvent->value.sockfd, NULL, NULL);
-                client * newClient = initNewClient(clientfd);
-                if(newClient == NULL) {
-                    printf("Server is full\n");
-                    msg newMsg;
-                    newMsg.type = FullServer;
-                    send(clientfd, &newMsg, sizeof newMsg, 0);
-                    close(clientfd);
-                    continue;
-                }
-                event * clientData = calloc(1, sizeof(event));
-                clientData->type = Client;
-                clientData->value.client = newClient;
-                struct epoll_event newEvent;
-                newEvent.events = EPOLLIN | EPOLLET | EPOLLHUP;
-                newEvent.data.ptr = clientData;
-                if((epoll_ctl(epfd, EPOLL_CTL_ADD, clientfd, &newEvent)) == -1) {
-                    error("Failed epoll_ctl for new client");
-                }
+            int sockfd = events[i].data.fd;
+            msg newMsg;
+            union sAddr from;
+            socklen_t length = sizeof(from);
+            recvfrom(sockfd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &from, &length);
+            if(newMsg.type == Connect) {
+                initNewClient(&from, length, sockfd, newMsg.value.nick);
             }
-            else if(readEvent->type == Client) {
-                if(events[i].events & EPOLLHUP) {
-                    pthread_mutex_lock(&mutex);
-                    deleteClient(readEvent->value.client);
-                    pthread_mutex_unlock(&mutex);
-                }
-                else {
-                    handleClient(readEvent->value.client);
-                }
+            else {
+                int index = findClientIndex(&from, length);
+                handleClientMessage(clients[index], newMsg);
             }
         }
     }

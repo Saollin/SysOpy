@@ -22,10 +22,16 @@ typedef struct gameData {
     char board[3][3];
 } gameData;
 
+union sAddr {
+    struct sockaddr_un ofUnix;
+    struct sockaddr_in ofWeb;    
+};
+
 typedef enum clientState { None, Init, Waiting, Playing } clientState;
 
 typedef struct client {
-    int fd;
+    union sAddr addr;
+    int fd, addrLength;
     clientState state;
     struct client * opponent;
     char nick[20];
@@ -44,7 +50,7 @@ typedef struct event {
     } value;
 } event;
 
-typedef enum msgType { Disconnect, 
+typedef enum msgType { Disconnect, Connect, 
 StartOfGame, Move, EndOfGame, StateOfGame,
 Ping, FullServer, Wait, NickNotAvailable
 } msgType;
@@ -52,6 +58,7 @@ Ping, FullServer, Wait, NickNotAvailable
 typedef struct msg {
     msgType type;
     union msgValue {
+        char nick[20];
         struct { char nick[20]; char symbol; } startInfo;
         int move;
         gameData state;
