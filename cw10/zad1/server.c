@@ -44,8 +44,13 @@ void deleteClient(client * deleted) {
     if(deleted == waitingClient) {
         waitingClient = NULL;
     }
+    if(deleted->opponent) {
+        client * op = deleted->opponent;
+        deleted->opponent->opponent = NULL;
+        deleteClient(op);
+        deleted->opponent = NULL;
+    }
     free(deleted->game);
-    deleted->opponent = NULL;
     deleted->game = NULL;
     deleted->state = None;
     deleted->nick[0] = 0;
