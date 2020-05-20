@@ -184,50 +184,55 @@ int main(int argc, char **argv) {
                 }
             } 
             else {
-                msg newMsg;
-                recv(sockfd, &newMsg, sizeof newMsg, 0);
-                if (newMsg.type == Wait) {
+                msg recvMsg;
+                recv(sockfd, &recvMsg, sizeof recvMsg, 0);
+                if (recvMsg.type == Wait) {
                     printf("Wait for an opponent\n");
                 }
-                else if (newMsg.type == StartOfGame) {
+                else if (recvMsg.type == StartOfGame) {
                     // fprintf(stderr, "here\n");
-                    opponentNick = newMsg.value.startInfo.nick;
-                    mySymbol = newMsg.value.startInfo.symbol;
+                    opponentNick = recvMsg.value.startInfo.nick;
+                    mySymbol = recvMsg.value.startInfo.symbol;
                     initDisplay();
                 }
-                else if (newMsg.type == NickNotAvailable) {
+                else if (recvMsg.type == NickNotAvailable) {
                     printf("Nick is not available\n");
                     close(sockfd);
                     exit(0);
                 }
-                else if (newMsg.type == FullServer) {
+                else if (recvMsg.type == FullServer) {
                     printf("Server is full. There is no place for you!\n");
                     close(sockfd);
                     exit(0);
                 }
-                else if (newMsg.type == Ping) {
-                    send(sockfd, &newMsg, sizeof newMsg, 0);
+                else if(recvMsg.type == Disconnect) {
+                    exit(0);
+                }
+                else if (recvMsg.type == Ping) {
+                    send(sockfd, &recvMsg, sizeof recvMsg, 0);
                 }
                 else if (events[i].events & EPOLLHUP) {
                     printf("You were disconnected\n\n");
+                    close(sockfd);
                     exit(0);
                 }
-                else if (newMsg.type == StateOfGame) {
-                    memcpy(&gameState, &newMsg.value.state, sizeof(gameData));
+                else if (recvMsg.type == StateOfGame) {
+                    memcpy(&gameState, &recvMsg.value.state, sizeof(gameData));
                     updateState();
                 }
-                else if (newMsg.type == EndOfGame) {
-                    if(newMsg.value.winner == mySymbol) {
+                else if (recvMsg.type == EndOfGame) {
+                    if(recvMsg.value.winner == mySymbol) {
                         printf("You won!!!\n");
                     }
-                    else if (newMsg.value.winner == '-') {
+                    else if (recvMsg.value.winner == '-') {
                         printf("Draw. No one won.\n");
                     }
                     else {
                         printf("You lost :(\n");
                     }
-                    close(sockfd);
-                    exit(0);
+                    msg newMsg;
+                    newMsg.type = Disconnect;
+                    send(sockfd, &newMsg, sizeof newMsg, 0);
                 }
             }
         }

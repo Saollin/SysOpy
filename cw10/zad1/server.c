@@ -6,6 +6,9 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 int epfd;
 client * waitingClient = NULL;
 client ** clients;
+int webSock;
+int localSock;
+char * pathOfSocket;
 
 int winConditions[8][3] = {
     {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // rows
@@ -40,6 +43,9 @@ client * initNewClient(int clientfd) {
 }
 
 void deleteClient(client * deleted) {
+    if(deleted == NULL) {
+        return;
+    }
     printf("Player %s was deleted\n", deleted->nick);
     if(deleted == waitingClient) {
         waitingClient = NULL;
@@ -47,6 +53,11 @@ void deleteClient(client * deleted) {
     if(deleted->opponent) {
         client * op = deleted->opponent;
         deleted->opponent->opponent = NULL;
+        // disconnect opponent
+        msg newMsg;
+        newMsg.type = Disconnect;
+        send(op->fd, &newMsg, sizeof newMsg, 0);
+        
         deleteClient(op);
         deleted->opponent = NULL;
     }
@@ -190,6 +201,12 @@ void handleClient(client * handledClient) {
                 sendGameData(handledClient);
             }
         }
+        else if(newMsg.type == Disconnect) {
+            msg newMsg;
+            newMsg.type = Disconnect;
+            send(handledClient->fd, &newMsg, sizeof newMsg, 0);
+            deleteClient(handledClient);
+        }
     }
 }
 
@@ -217,6 +234,7 @@ void * pingFunc() {
     while(true) {
         sleep(8);
         pthread_mutex_lock(&mutex);
+        printf("Ping to clients\n");
         for(int i = 0; i < maxConnections; i++) {
             if(clients[i]->state != None) {
                 if(clients[i]->isActive) {
@@ -243,13 +261,23 @@ void init() {
     }
 }
 
+void sigintHandler(int signal) {
+    printf("\nServer closed\n");
+    epoll_ctl(epfd, EPOLL_CTL_DEL, webSock, NULL);
+    epoll_ctl(epfd, EPOLL_CTL_DEL, localSock, NULL);
+    close(localSock);
+    close(webSock);
+    unlink(pathOfSocket);
+    exit(0);
+}
+
 int main(int argc, char ** argv) {
     if(argc != 3) {
         printf("Wrong number of arguments!\n");
         exit(0);
     }
     int portNumber = atoi(argv[1]);
-    char * pathOfSocket = argv[2];
+    pathOfSocket = argv[2];
     init();
 
     struct sockaddr_in web;
@@ -257,7 +285,7 @@ int main(int argc, char ** argv) {
     web.sin_port = htons(portNumber);
     web.sin_addr.s_addr = htonl(INADDR_ANY);
     
-    int webSock = socket(AF_INET, SOCK_STREAM, 0);
+    webSock = socket(AF_INET, SOCK_STREAM, 0);
     if(webSock == -1){
         error("Failed creating web socket");
     }
@@ -269,7 +297,7 @@ int main(int argc, char ** argv) {
     local.sun_family = AF_UNIX;
     strncpy(local.sun_path, pathOfSocket, sizeof(local.sun_path) -1);
     
-    int localSock = socket(AF_UNIX, SOCK_STREAM, 0);
+    localSock = socket(AF_UNIX, SOCK_STREAM, 0);
     if(localSock == -1){
         error("Failed creating local socket");
     }
@@ -279,6 +307,7 @@ int main(int argc, char ** argv) {
 
     pthread_t pingThread;
     pthread_create(&pingThread, NULL, pingFunc, NULL);
+    signal(SIGINT, sigintHandler);
 
     struct epoll_event events[10];
     while(true) {

@@ -15,13 +15,11 @@ compile: clean server client
 runServer: server
 	./server 8000 .socket
 
-name="Greg"
-runClientWeb: client
-	./client $(name) web 127.0.0.1 8000
+runClientWeb: 
+	./client "Greg" web 127.0.0.1 8000
 
-name="Piotr"
-runClientUnix: client
-	./client $(name) unix .socket 
+runClientUnix: 
+	./client "Piotr" unix .socket 
 
 clean:
 	rm -f server client
