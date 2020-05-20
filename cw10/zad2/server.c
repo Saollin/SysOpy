@@ -6,6 +6,9 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 int epfd;
 client * waitingClient = NULL;
 client ** clients;
+int localSock;
+int webSock;
+char * pathOfSocket;
 
 int winConditions[8][3] = {
     {0, 1, 2}, {3, 4, 5}, {6, 7, 8}, // rows
@@ -104,6 +107,9 @@ void initNewClient(union sAddr * addr, socklen_t length, int clientfd, char * ni
 }
 
 void deleteClient(client * deleted) {
+    if(deleted == NULL) {
+        return;
+    }
     printf("Player %s was deleted\n", deleted->nick);
     if(deleted == waitingClient) {
         waitingClient = NULL;
@@ -111,11 +117,11 @@ void deleteClient(client * deleted) {
     msg newMsg;
     newMsg.type = Disconnect;
     sendto(deleted->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &deleted->addr, deleted->addrLength);
-    free(deleted->game);
     memset(&deleted->addr, 0, sizeof deleted->addr);
-    if(deleted->opponent) {
+    free(deleted->game);
+    if(deleted->opponent != NULL) {
         client * op = deleted->opponent;
-        deleted->opponent = NULL;
+        deleted->opponent->opponent = NULL;
         deleteClient(op);
     }
     deleted->opponent = NULL;
@@ -125,7 +131,6 @@ void deleteClient(client * deleted) {
 }
 
 bool checkWin(client * clnt) {
-    // char ** gameBoard = clnt->game->board;
     char symbol = clnt->symbol;
     for(int i = 0; i < 8; i++) {
         int * cond = winConditions[i];
@@ -164,8 +169,8 @@ void handleClientMessage(client * sender, msg received) {
             sendGameData(sender);
             sendGameData(sender->opponent);
             msg newMsg;
+            newMsg.type = Ping;
             if (checkWin(sender)) {
-                fprintf(stderr, "h\n");
                 newMsg.type = EndOfGame;
                 newMsg.value.winner =  sender->symbol;
             }
@@ -177,6 +182,8 @@ void handleClientMessage(client * sender, msg received) {
                 sender->opponent->opponent = NULL;
                 sendto(sender->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &sender->addr, sender->addrLength);
                 sendto(sender->opponent->fd, &newMsg, sizeof newMsg, 0, (struct sockaddr*) &sender->opponent->addr, sender->opponent->addrLength);
+                deleteClient(sender);
+                deleteClient(sender->opponent);
             }
         }
         else {
@@ -237,6 +244,23 @@ void init() {
     }
 }
 
+void sigintHandler(int signal) {
+    pthread_mutex_lock(&mutex);
+    printf("\nServer closed\n");
+    for(int i = 0; i < maxConnections; i++) {
+        if(clients[i]->state != None) {
+            deleteClient(clients[i]);
+        }
+    }
+    pthread_mutex_unlock(&mutex);
+    epoll_ctl(epfd, EPOLL_CTL_DEL, webSock, NULL);
+    epoll_ctl(epfd, EPOLL_CTL_DEL, localSock, NULL);
+    close(localSock);
+    close(webSock);
+    unlink(pathOfSocket);
+    exit(0);
+}
+
 int findClientIndex(union sAddr * addr, socklen_t length) {
     for(int i = 0; i < maxConnections; i++) {
         if(!memcmp(&clients[i]->addr, addr, length)) {
@@ -252,14 +276,14 @@ int main(int argc, char ** argv) {
         exit(0);
     }
     int portNumber = atoi(argv[1]);
-    char * pathOfSocket = argv[2];
+    pathOfSocket = argv[2];
     init();
 
     struct sockaddr_in web;
     web.sin_family = AF_INET;
     web.sin_port = htons(portNumber);
     web.sin_addr.s_addr = htonl(INADDR_ANY);
-    int webSock = socket(AF_INET, SOCK_DGRAM, 0);
+    webSock = socket(AF_INET, SOCK_DGRAM, 0);
     if(webSock == -1){
         error("Failed creating web socket");
     }
@@ -271,7 +295,7 @@ int main(int argc, char ** argv) {
     local.sun_family = AF_UNIX;
     strncpy(local.sun_path, pathOfSocket, sizeof(local.sun_path));
     
-    int localSock = socket(AF_UNIX, SOCK_DGRAM, 0);
+    localSock = socket(AF_UNIX, SOCK_DGRAM, 0);
     if(localSock == -1){
         error("Failed creating local socket");
     }
@@ -281,6 +305,7 @@ int main(int argc, char ** argv) {
 
     pthread_t pingThread;
     pthread_create(&pingThread, NULL, pingFunc, NULL);
+    signal(SIGINT, sigintHandler);
 
     struct epoll_event events[10];
     while(true) {

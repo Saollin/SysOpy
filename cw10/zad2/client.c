@@ -5,10 +5,11 @@
 #define DEF_COL "\033[0m"
 #define HELP_COL "\033[01;32m"
 
-int sockfd;
+int sockfd = -1;
 int epfd;
 char * nick;
 char * opponentNick;
+char * sockName;
 char mySymbol;
 gameData gameState;
 
@@ -22,8 +23,8 @@ void error(char * message) {
 
 char* randomName() {
     char* name = calloc(12, sizeof(char));
-    sprintf(name, ".socket");
-    for (int i = 7; i < 11; i++) {
+    sprintf(name, ".sock");
+    for (int i = 5; i < 11; i++) {
         char letter = 'a' + (rand() % 26);
         name[i] = letter;
     }
@@ -32,25 +33,27 @@ char* randomName() {
 }
 
 int initUnixSocket(char * path) {
-    struct  sockaddr_un local;
+    struct sockaddr_un local;
     memset(&local, 0, sizeof local);
     local.sun_family = AF_UNIX;
-    strcpy(local.sun_path, path);
+    strncpy(local.sun_path, path, sizeof local.sun_path - 1);
     int fd = socket(AF_UNIX, SOCK_DGRAM, 0);
     if(fd == -1) {
         error("While creating unix socket");
     }
-
+    int yes = 1;
+    if(setsockopt(fd, SOL_SOCKET, SO_PASSCRED | SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
+        error("Failed setsockopt");
+    }
     struct sockaddr_un bindLocal;
     memset(&bindLocal, 0, sizeof bindLocal);
     bindLocal.sun_family = AF_UNIX;
-    char * sockName = randomName();
+    sockName = randomName();
+    strncpy(bindLocal.sun_path, sockName, sizeof bindLocal.sun_path - 1);
     unlink(sockName);
-    strncpy(bindLocal.sun_path, sockName, sizeof bindLocal.sun_path);
     if(bind(fd, (struct sockaddr *) &bindLocal, sizeof bindLocal) == -1) {
         error("While binding unix socket");
     }
-
     if(connect(fd, (struct sockaddr *) &local, sizeof local) == -1) {
         error("While connecting unix socket");
     } 
@@ -58,6 +61,10 @@ int initUnixSocket(char * path) {
 }
 
 int initWebSocket(char* ipv4, int port) {
+    int fd = socket(AF_INET, SOCK_DGRAM, 0);
+    if(fd < -1) {
+        error("While creating web socket");
+    }
     struct sockaddr_in web;
     memset(&web, 0, sizeof(web));
     web.sin_family = AF_INET;
@@ -65,11 +72,7 @@ int initWebSocket(char* ipv4, int port) {
     if(inet_pton(AF_INET, ipv4, &web.sin_addr) <= 0) {
         error("Invalid ip adress");
     }
-    int fd = socket(AF_INET, SOCK_DGRAM, 0);
-    if(fd == -1) {
-        error("While creating web socket");
-    }
-    if(connect(fd, (struct sockaddr *) &web, sizeof web) == -1) {
+    if(connect(fd, (struct sockaddr *) &web, sizeof web) < -1) {
         error("While connecting web socket");
     } 
     return fd;
@@ -131,7 +134,6 @@ void updateState() {
     displayState();
 }
 
-
 void initDisplay() {
     printf("Your nick is %s\nYour opponent's nick: %s\n\n", nick, opponentNick);
     printf(HELP_COL"Numbers of cells: \n");
@@ -144,11 +146,18 @@ void initDisplay() {
 void sigintHandler(int signal) {
     msg newMsg;
     newMsg.type = Disconnect;
-    send(sockfd, &newMsg, sizeof newMsg, 0);
+    sendto(sockfd, &newMsg, sizeof newMsg, 0, NULL, 0);
     exit(0);
 }
 
+void end() {
+    if(sockfd == -1) close(sockfd);
+    unlink(sockName);
+}
+
 int main(int argc, char **argv) {
+    srand(time(NULL));
+    atexit(end);
     if(!strcmp(argv[2], "web") && argc == 5) {
         sockfd = initWebSocket(argv[3], atoi(argv[4]));
     }
@@ -164,7 +173,8 @@ int main(int argc, char **argv) {
 
     msg newMsg;
     newMsg.type = Connect;
-    strcpy(newMsg.value.nick, argv[1]);
+    nick = argv[1];
+    strcpy(newMsg.value.nick, nick);
     send(sockfd, &newMsg, sizeof newMsg, 0);
 
     if((epfd = epoll_create1(0)) == -1){
@@ -208,53 +218,48 @@ int main(int argc, char **argv) {
                 }
             } 
             else {
-                msg newMsg;
-                recvfrom(sockfd, &newMsg, sizeof newMsg, 0, NULL, 0);
-                if (newMsg.type == Wait) {
+                msg recvMsg;
+                recvfrom(sockfd, &recvMsg, sizeof recvMsg, 0, NULL, 0);
+                if (recvMsg.type == Wait) {
                     printf("Wait for an opponent\n");
                 }
-                else if (newMsg.type == StartOfGame) {
-                    // fprintf(stderr, "here\n");
-                    opponentNick = newMsg.value.startInfo.nick;
-                    mySymbol = newMsg.value.startInfo.symbol;
+                else if (recvMsg.type == StartOfGame) {
+                    opponentNick = recvMsg.value.startInfo.nick;
+                    mySymbol = recvMsg.value.startInfo.symbol;
                     initDisplay();
                 }
-                else if (newMsg.type == NickNotAvailable) {
+                else if (recvMsg.type == NickNotAvailable) {
                     printf("Nick is not available\n");
-                    close(sockfd);
                     exit(0);
                 }
-                else if (newMsg.type == FullServer) {
+                else if (recvMsg.type == FullServer) {
                     printf("Server is full. There is no place for you!\n");
-                    close(sockfd);
                     exit(0);
                 }
-                else if(newMsg.type == Disconnect) {
+                else if(recvMsg.type == Disconnect) {
                     exit(0);
                 }
-                else if (newMsg.type == Ping) {
-                    send(sockfd, &newMsg, sizeof newMsg, 0);
+                else if (recvMsg.type == Ping) {
+                    send(sockfd, &recvMsg, sizeof recvMsg, 0);
                 }
                 else if (events[i].events & EPOLLHUP) {
                     printf("You were disconnected\n\n");
                     exit(0);
                 }
-                else if (newMsg.type == StateOfGame) {
-                    memcpy(&gameState, &newMsg.value.state, sizeof(gameData));
+                else if (recvMsg.type == StateOfGame) {
+                    memcpy(&gameState, &recvMsg.value.state, sizeof(gameData));
                     updateState();
                 }
-                else if (newMsg.type == EndOfGame) {
-                    if(newMsg.value.winner == mySymbol) {
+                else if (recvMsg.type == EndOfGame) {
+                    if(recvMsg.value.winner == mySymbol) {
                         printf("You won!!!\n");
                     }
-                    else if (newMsg.value.winner == '-') {
+                    else if (recvMsg.value.winner == '-') {
                         printf("Draw. No one won.\n");
                     }
                     else {
                         printf("You lost :(\n");
                     }
-                    close(sockfd);
-                    exit(0);
                 }
             }
         }
